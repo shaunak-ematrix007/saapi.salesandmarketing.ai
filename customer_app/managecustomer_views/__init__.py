@@ -1,0 +1,1 @@
+# managecustomer_views package
