@@ -273,6 +273,45 @@ class TenantDetails(models.Model):
         managed = False
         db_table = "TENANT_DETAILS"
 
+class Clients(models.Model):
+    cliId = models.BigAutoField(db_column='CLI_ID', primary_key=True)
+    cliTenantId = models.BigIntegerField(db_column='CLI_TENANT_ID')
+    cliName = models.CharField(db_column='CLI_NAME', max_length=50, null=True, blank=True)
+    cliType = models.CharField(db_column='CLI_TYPE', max_length=25, null=True, blank=True)
+    cliAudience = models.CharField(db_column='CLI_AUDIENCE', max_length=25, null=True, blank=True)
+    cliWebsite = models.CharField(db_column='CLI_WEBSITE', max_length=100, null=True, blank=True)
+    cliWebsiteColors = models.CharField(db_column='CLI_WEBSITE_COLORS', max_length=2000, null=True, blank=True)
+    cliLogo = models.CharField(db_column='CLI_LOGO', max_length=500, null=True, blank=True)
+    cliCustomerFooter = models.CharField(db_column='CLI_CUSTOMER_FOOTER', max_length=500, null=True, blank=True)
+    cliLinkedin = models.CharField(db_column='CLI_LINKEDIN', max_length=100, null=True, blank=True)
+    cliRevenue = models.DecimalField(db_column='CLI_REVENE', max_digits=10, decimal_places=2, null=True, blank=True)
+    cliNumEmployees = models.DecimalField(db_column='CLI_NUM_EMPLOYEES', max_digits=10, decimal_places=2, null=True, blank=True)
+    cliStockTicker = models.CharField(db_column='CLI_STOCK_TICKER', max_length=25, null=True, blank=True)
+    cli10DlcStatus = models.CharField(db_column='CLI_10DLC_STATUS', max_length=25, null=True, blank=True)
+    cliSipFriendlyName = models.CharField(db_column='CLI_SIP_FRIENDLY_NAME', max_length=255, null=True, blank=True)
+    cliSmsAccountSid = models.CharField(db_column='CLI_SMS_ACCOUNT_SID', max_length=255, null=True, blank=True)
+    cliSipConnectionId = models.CharField(db_column='CLI_SIP_CONNECTION_ID', max_length=255, null=True, blank=True)
+    cliSipUsername = models.CharField(db_column='CLI_SIP_USERNAME', max_length=255, null=True, blank=True)
+    cliSipPassword = models.CharField(db_column='CLI_SIP_PASSWORD', max_length=255, null=True, blank=True)
+    cliBusinessName = models.CharField(db_column='CLI_BUSINESS_NAME', max_length=100, null=True, blank=True)
+    cliProfileImageUrl = models.CharField(db_column='CLI_PROFILE_IMAGE_URL', max_length=255, null=True, blank=True)
+    cliTimeZone = models.CharField(db_column='CLI_TIME_ZONE', max_length=255, null=True, blank=True)
+    cliSubAccountTypeId = models.BigIntegerField(db_column='CLI_SUB_ACCOUNT_TYPE_ID', default=0)
+    cliSmsForwardMyphoneYn = models.CharField(db_column='CLI_SMS_FORWARD_MYPHONE_YN', max_length=1, default='Y')
+    cliFbId = models.CharField(db_column='CLI_FB_ID', max_length=255, null=True, blank=True)
+    cliFbAccessToken = models.CharField(db_column='CLI_FB_ACCESS_TOKEN', max_length=2000, null=True, blank=True)
+    cliTwOauthtoken = models.CharField(db_column='CLI_TW_OAUTHTOKEN', max_length=2000, null=True, blank=True)
+    cliTwOauthtokenSecret = models.CharField(db_column='CLI_TW_OAUTHTOKEN_SECRET', max_length=2000, null=True, blank=True)
+    cliLinAuthToken = models.CharField(db_column='CLI_LIN_AUTH_TOKEN', max_length=2000, null=True, blank=True)
+    cliLinExpiresAt = models.CharField(db_column='CLI_LIN_EXPIRES_AT', max_length=255, null=True, blank=True)
+    cliZoomToken = models.CharField(db_column='CLI_ZOOM_TOKEN', max_length=2000, null=True, blank=True)
+    # Oracle VECTOR(768, FLOAT32)
+    cliEmbedding = models.JSONField(db_column='CLI_EMBEDDING', null=True, blank=True)
+
+    class Meta:
+        db_table = 'CLIENTS'
+        managed = False
+
 class CountrySetting(models.Model):
     id = models.BigAutoField(primary_key=True, db_column='ID')
     cntyId = models.BigIntegerField(db_column='CNTY_ID', null=True, blank=True)

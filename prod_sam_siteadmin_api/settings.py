@@ -114,9 +114,9 @@ oracledb.init_oracle_client(lib_dir='/usr/lib/oracle/23/client64/lib')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.oracle',
-        'NAME': '10.0.130.233:1521/prod.salesandmarketing.ai',
+        'NAME': '10.0.130.233:1521/qa.salesandmarketing.ai',
         'USER': 'samai',
-        'PASSWORD': 'egojcyz55RgeupxoB##',
+        'PASSWORD': '9L5OE70d+W33<s8?Aq,$',
     }
 }
 

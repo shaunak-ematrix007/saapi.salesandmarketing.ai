@@ -12,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 
 from auth_app.authentication import CustomJWTAuthentication
-from common_app.models import Member
+from common_app.models import Tenants
 from common_app.responses import CustomResponse
 
 logger = logging.getLogger(__name__)
@@ -63,11 +63,11 @@ def get_dashboard_new_users(request: Request) -> CustomResponse:
 
         # Query and aggregate using Django ORM with TruncMonth, values, and annotate
         db_results = (
-            Member.objects
-            .filter(dateRegistered__gte=start_datetime)
-            .annotate(year_month=TruncMonth('dateRegistered'))
+            Tenants.objects
+            .filter(ten_date_registered__gte=start_datetime)
+            .annotate(year_month=TruncMonth('ten_date_registered'))
             .values('year_month')
-            .annotate(user_count=Count('memberId'))
+            .annotate(user_count=Count('tenId'))
             .order_by('year_month')
         )
 
