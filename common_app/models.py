@@ -888,14 +888,14 @@ class SpReply(models.Model):
 
 
 class DeleteAccount(models.Model):
-    daId = models.BigAutoField(primary_key=True, db_column='daId')
-    daAccountId = models.BigIntegerField(db_column='daAccountId')
-    daAccountName = models.CharField(max_length=255, db_column='daAccountName')
-    daEmail = models.CharField(max_length=255, db_column='daEmail')
-    daIpAddress = models.CharField(max_length=255, db_column='daIpAddress')
-    daDateTime = models.CharField(max_length=255, db_column='daDateTime')
-    daLeavingDetails = models.TextField(db_column='daLeavingDetails')
-    daACN = models.TextField(db_column='daACN')
+    daId = models.BigAutoField(primary_key=True, db_column='DA_ID')
+    daAccountId = models.BigIntegerField(db_column='DA_ACCOUNT_ID')
+    daAccountName = models.CharField(max_length=255, db_column='DA_ACCOUNT_NAME')
+    daEmail = models.CharField(max_length=255, db_column='DA_EMAIL')
+    daIpAddress = models.CharField(max_length=255, db_column='DA_IP_ADDRESS')
+    daDateTime = models.CharField(max_length=255, db_column='DA_DATE_TIME')
+    daLeavingDetails = models.TextField(db_column='DA_LEAVING_DETAILS')
+    daACN = models.TextField(db_column='DA_ACN')
 
     class Meta:
         managed = False
@@ -915,132 +915,120 @@ class MemberStatus(models.Model):
 
 
 class Group(models.Model):
-    groupId = models.BigAutoField(primary_key=True, db_column='Group_Id')
-    groupName = models.CharField(max_length=75, db_column='Group_Name')
-    storeName = models.CharField(max_length=255, db_column='Store_Name', null=True, blank=True)
-    ecomCustListType = models.CharField(max_length=50, db_column='ecom_cust_list_type', null=True, blank=True)
-    dateRegistered = models.DateTimeField(db_column='Date_Registered', default=timezone.now)
-    subMemberId = models.BigIntegerField(db_column='sub_member_id', default=0)
-    memberId = models.BigIntegerField(db_column='Member_Id', null=True, blank=True)
+    groupId = models.BigAutoField(primary_key=True, db_column='GRP_ID')
+    groupName = models.CharField(max_length=75, db_column='GRP_GROUP_NAME')
+    dateRegistered = models.DateTimeField(db_column='GRP_DATE_REGISTERED', default=timezone.now)
+    lockGroup = models.CharField(db_column='GRP_LOCK_GROUP', max_length=1, default='N')
+    segmentYn = models.CharField(db_column='GRP_SEGMENT_YN', max_length=1, default='N')
+    duplicateRecordsYn = models.CharField(db_column='GRP_DUPLICATE_RECORDS_YN', max_length=1, default='N')
+    typeEmail = models.CharField(db_column='GRP_TYPE_EMAIL', max_length=255, default='unverified')
+    totalMember = models.BigIntegerField(db_column='GRP_TOTAL_MEMBER', default=0)
+    memberId = models.BigIntegerField(db_column='GRP_CLIENT_ID', null=True, blank=True)
+    grpEmbedding = models.JSONField(null=True, blank=True, db_column='GRP_EMBEDDING')
 
     class Meta:
         managed = False
-        db_table = 'tbl_groups'
+        db_table = 'GROUPS'
 
 
 class GroupSegment(models.Model):
-    segId = models.BigAutoField(primary_key=True, db_column='segId')
-    segName = models.CharField(max_length=255, db_column='segName', null=True, blank=True)
-    groupId = models.BigIntegerField(db_column='Group_Id', null=True, blank=True)
-    memberId = models.BigIntegerField(db_column='Member_id', null=True, blank=True)
-    segQuery = models.TextField(db_column='segQuery', null=True, blank=True)
-    segDateAdded = models.DateTimeField(db_column='segAddedDate', default=timezone.now)
-    subMemberId = models.BigIntegerField(db_column='sub_member_id', null=True, blank=True)
+    segId = models.BigAutoField(db_column='SEG_ID', primary_key=True)
+    segName = models.CharField(db_column='SEG_NAME', max_length=255, null=True, blank=True)
+    groupId = models.BigIntegerField(db_column='SEG_GROUP_ID', null=True, blank=True)
+    memberId = models.BigIntegerField(db_column='SEG_CLIENT_ID', null=True, blank=True)
+    segQuery = models.CharField(db_column='SEG_QUERY', max_length=2000, null=True, blank=True)
+    segDateAdded = models.DateTimeField(db_column='SEGADDEDDATE')
+    segEmbedding = models.JSONField(null=True, blank=True, db_column='SEG_EMBEDDING')
 
     class Meta:
         managed = False
-        db_table = 'tbl_segment'
+        db_table = 'SEGMENTS'
 
 
 class GroupSegmentField(models.Model):
-    segfId = models.BigAutoField(primary_key=True, db_column='segfId')
-    segId = models.BigIntegerField(db_column='segId', null=True, blank=True)
-    segFieldName = models.CharField(max_length=255, db_column='segfFeildsName', null=True, blank=True)
-    segFieldOperator = models.CharField(max_length=255, db_column='segfOperator', null=True, blank=True)
-    segFieldValue = models.CharField(max_length=255, db_column='segFeildsValue', null=True, blank=True)
-    segConditions = models.CharField(max_length=255, db_column='segfConditions', null=True, blank=True)
-    segDisplayOrder = models.BigIntegerField(db_column='segfDisplayOrder', null=True, blank=True)
+    segfId = models.BigAutoField(db_column='SF_ID', primary_key=True)
+    segId = models.BigIntegerField(db_column='SF_SEG_ID')
+    segFieldName = models.CharField(db_column='SF_FEILDS_NAME', max_length=255, null=True, blank=True)
+    segFieldOperator = models.CharField(db_column='SF_OPERATOR', max_length=255, null=True, blank=True)
+    segFieldValue = models.CharField(db_column='SF_FIELDS_VALUE', max_length=255, null=True, blank=True)
+    segConditions = models.CharField(db_column='SF_CONDITIONS', max_length=255, null=True, blank=True)
+    segDisplayOrder = models.BigIntegerField(db_column='SF_DISPLAY_ORDER', null=True, blank=True)
+    segEmbedding = models.JSONField(null=True, blank=True, db_column='SEG_EMBEDDING')
 
     class Meta:
         managed = False
-        db_table = 'tbl_segment_fields'
+        db_table = 'SEGMENT_FIELDS'
 
 
 class TempUserlist(models.Model):
-    emailId = models.BigAutoField(primary_key=True, db_column='Email_Id')
-    age = models.FloatField(null=True, blank=True, db_column='age')
-    birthday = models.CharField(max_length=255, null=True, blank=True, db_column='birthday')
-    cc = models.CharField(max_length=255, null=True, blank=True, db_column='CC')
-    city = models.CharField(max_length=255, null=True, blank=True, db_column='city')
-    confirmDateTime = models.CharField(max_length=255, null=True, blank=True, db_column='confirmDateTime')
-    confirmIP = models.CharField(max_length=255, null=True, blank=True, db_column='confirmIP')
-    contactRating = models.BigIntegerField(null=True, blank=True, db_column='contactRating')
-    country = models.CharField(max_length=255, null=True, blank=True, db_column='country')
-    dateAdded = models.CharField(max_length=255, null=True, blank=True, db_column='dateAdded')
-    dateLastModified = models.CharField(max_length=255, null=True, blank=True, db_column='dateLastModified')
-    dstOff = models.CharField(max_length=255, null=True, blank=True, db_column='dstOff')
-    email = models.CharField(max_length=255, null=True, blank=True, db_column='Email')
-    emailClientUsed = models.CharField(max_length=255, null=True, blank=True, db_column='emailClientUsed')
-    emailLists = models.CharField(max_length=255, null=True, blank=True, db_column='emailLists')
-    emailPermissionStatusOther = models.CharField(max_length=255, null=True, blank=True, db_column='emailPermissionStatusOther')
-    euid = models.CharField(max_length=255, null=True, blank=True, db_column='EUID')
-    firstName = models.CharField(max_length=250, null=True, blank=True, db_column='First_Name')
-    gender = models.CharField(max_length=255, null=True, blank=True, db_column='gender')
-    gmtOff = models.CharField(max_length=255, null=True, blank=True, db_column='gmtOff')
-    jobTitle = models.CharField(max_length=255, null=True, blank=True, db_column='jobTitle')
-    lastName = models.CharField(max_length=250, null=True, blank=True, db_column='Last_Name')
-    latitude = models.CharField(max_length=255, null=True, blank=True, db_column='latitude')
-    leid = models.CharField(max_length=255, null=True, blank=True, db_column='LEID')
-    longitude = models.CharField(max_length=255, null=True, blank=True, db_column='longitude')
-    notes = models.TextField(null=True, blank=True, db_column='notes')
-    optDate = models.CharField(max_length=255, null=True, blank=True, db_column='optDate')
-    optInIPAddress = models.CharField(max_length=255, null=True, blank=True, db_column='optInIPAddress')
-    optOutIpAddress = models.CharField(max_length=255, null=True, blank=True, db_column='optOutIpAddress')
-    phoneNumber = models.CharField(max_length=255, null=True, blank=True, db_column='phoneNumber')
-    region = models.CharField(max_length=255, null=True, blank=True, db_column='region')
-    selectDateFormat = models.CharField(max_length=255, null=True, blank=True, db_column='selectDateFormat')
-    signupSource = models.CharField(max_length=255, null=True, blank=True, db_column='signupSource')
-    stateProvRegion = models.CharField(max_length=255, null=True, blank=True, db_column='stateProvRegion')
-    status = models.CharField(max_length=255, null=True, blank=True, db_column='status')
-    streetAddress1 = models.TextField(null=True, blank=True, db_column='street_address1')
-    streetAddress2 = models.TextField(null=True, blank=True, db_column='street_address2')
-    fullName = models.CharField(max_length=255, null=True, blank=True, db_column='full_name')
-    phone = models.CharField(max_length=255, null=True, blank=True, db_column='phone')
-    subMemberId = models.BigIntegerField(null=True, blank=True, db_column='sub_member_id')
-    tags = models.TextField(null=True, blank=True, db_column='tags')
-    timeZone = models.CharField(max_length=255, null=True, blank=True, db_column='timeZone')
-    transId = models.CharField(max_length=500, null=True, blank=True, db_column='Trans_Id')
-    udf1 = models.CharField(max_length=250, null=True, blank=True, db_column='udf1')
-    udf2 = models.CharField(max_length=250, null=True, blank=True, db_column='udf2')
-    udf3 = models.CharField(max_length=250, null=True, blank=True, db_column='udf3')
-    udf4 = models.CharField(max_length=250, null=True, blank=True, db_column='udf4')
-    udf5 = models.CharField(max_length=250, null=True, blank=True, db_column='udf5')
-    udf6 = models.CharField(max_length=250, null=True, blank=True, db_column='udf6')
-    udf7 = models.CharField(max_length=250, null=True, blank=True, db_column='udf7')
-    udf8 = models.CharField(max_length=250, null=True, blank=True, db_column='udf8')
-    udf9 = models.CharField(max_length=250, null=True, blank=True, db_column='udf9')
-    udf10 = models.CharField(max_length=250, null=True, blank=True, db_column='udf10')
-    zipPostalCode = models.CharField(max_length=255, null=True, blank=True, db_column='zipPostalCode')
-    memberId = models.BigIntegerField(null=True, blank=True, db_column='Member_Id')
-    usDefaultLanguage = models.CharField(max_length=255, null=True, blank=True, db_column='us_default_language')
+    emailId = models.BigAutoField(db_column='TUL_EMAIL_ID', primary_key=True)
+    birthday = models.CharField(db_column='TUL_BIRTHDAY', max_length=255, null=True, blank=True)
+    city = models.CharField(db_column='TUL_CITY', max_length=255, null=True, blank=True)
+    country = models.CharField(db_column='TUL_COUNTRY', max_length=255, null=True, blank=True)
+    dateAdded = models.CharField(db_column='TUL_DATE_ADDED', max_length=255, null=True, blank=True)
+    dateLastModified = models.CharField(db_column='TUL_DATEL_AS_MODIFIED', max_length=255, null=True, blank=True)
+    email = models.CharField(db_column='TUL_EMAIL', max_length=255)
+    firstName = models.CharField(db_column='TUL_FIRST_NAME', max_length=250, null=True, blank=True)
+    gender = models.CharField(db_column='TUL_GENDER', max_length=255, null=True, blank=True)
+    lastName = models.CharField(db_column='TUL_LAST_NAME', max_length=250, null=True, blank=True)
+    optDate = models.CharField(db_column='TUL_OPT_DATE', max_length=255, null=True, blank=True)
+    phoneNumber = models.CharField(db_column='TUL_PHONE_NUMBER', max_length=255, null=True, blank=True)
+    stateProvRegion = models.CharField(db_column='TUL_STATE_PROV_REGION', max_length=255, null=True, blank=True)
+    status = models.CharField(db_column='TUL_STATUS', max_length=255, null=True, blank=True)
+    streetAddress1 = models.TextField(db_column='TUL_STREET_ADDRESS1', null=True, blank=True)
+    streetAddress2 = models.TextField(db_column='TUL_STREET_ADDRESS2', null=True, blank=True)
+    fullName = models.CharField(db_column='TUL_FULL_NAME', max_length=255, null=True, blank=True)
+    phone = models.CharField(db_column='TUL_PHONE', max_length=255, null=True, blank=True)
+    tags = models.CharField(db_column='TUL_TAGS', max_length=250, null=True, blank=True)
+    transId = models.CharField(db_column='TUL_TRANS_ID', max_length=500, null=True, blank=True)
+    udf1 = models.CharField(db_column='TUL_UDF1', max_length=250, null=True, blank=True)
+    udf10 = models.CharField(db_column='TUL_UDF10', max_length=250, null=True, blank=True)
+    udf2 = models.CharField(db_column='TUL_UDF2', max_length=250, null=True, blank=True)
+    udf3 = models.CharField(db_column='TUL_UDF3', max_length=250, null=True, blank=True)
+    udf4 = models.CharField(db_column='TUL_UDF4', max_length=250, null=True, blank=True)
+    udf5 = models.CharField(db_column='TUL_UDF5', max_length=250, null=True, blank=True)
+    udf6 = models.CharField(db_column='TUL_UDF6', max_length=250, null=True, blank=True)
+    udf7 = models.CharField(db_column='TUL_UDF7', max_length=250, null=True, blank=True)
+    udf8 = models.CharField(db_column='TUL_UDF8', max_length=250, null=True, blank=True)
+    udf9 = models.CharField(db_column='TUL_UDF9', max_length=250, null=True, blank=True)
+    zipPostalCode = models.CharField(db_column='TUL_ZIP_POSTAL_CODE', max_length=255, null=True, blank=True)
+    memberId = models.BigIntegerField(db_column='TUL_CLIENT_ID', null=True, blank=True)
+    usDefaultLanguage = models.CharField(db_column='TUL_US_DEFAULT_LANGUAGE', max_length=255, null=True, blank=True)
 
     class Meta:
+        db_table = 'TEMP_USER_LIST'
         managed = False
-        db_table = 'tbl_temp_userlist'
 
 
 class TempCronUserListTotal(models.Model):
-    cronId = models.BigAutoField(primary_key=True, db_column='cronId')
-    cronMemberId = models.BigIntegerField(db_column='cronMemberId')
-    cronGroupId = models.BigIntegerField(db_column='cronGroupId')
-    cronStartId = models.BigIntegerField(db_column='cronStartId')
-    cronEndId = models.BigIntegerField(db_column='cronEndId')
-    cronProcess = models.CharField(max_length=255, null=True, blank=True, db_column='cronProcess')
-    cronProcessFinished = models.CharField(max_length=1, null=True, blank=True, db_column='cronProcessFinished')
-    cronOptInMessage = models.TextField(null=True, blank=True, db_column='cronOptInMessage')
+    cronId = models.BigAutoField(db_column='CRON_ID', primary_key=True)
+    cronMemberId = models.BigIntegerField(db_column='CRON_CLIENT_ID')
+    cronGroupId = models.BigIntegerField(db_column='CRON_GROUP_ID')
+    cronStartId = models.BigIntegerField(db_column='CRON_START_ID')
+    cronEndId = models.BigIntegerField(db_column='CRON_END_ID')
+    cronProcess = models.CharField(db_column='CRON_PROCESS', max_length=1, null=True, blank=True)
+    cronProcessFinished = models.CharField(db_column='CRON_PROCESS_FINISHED', max_length=1, null=True, blank=True)
+    cronOptInMessage = models.CharField(db_column='CRON_OPT_IN_MESSAGE', max_length=250, null=True, blank=True)
+    transId = models.CharField(db_column='CRON_TRANS_ID', max_length=255, null=True, blank=True)
+    cronCheckDuplicateYN = models.CharField(db_column='CRON_CHECK_DUPLICATE_YN', max_length=1, default='N')
+    cronOptInYN = models.CharField(db_column='CRON_OPT_IN_YN', max_length=1, default='N')
+    cronEmailVerification = models.CharField(db_column='CRON_EMAIL_VERIFICATION', max_length=1, default='N')
+    swapColumns = models.CharField(db_column='CRON_SWAP_COLUMNS', max_length=2000, null=True, blank=True)
+    blankFieldsList = models.CharField(db_column='CRON_BLANK_FIELDS_LIST', max_length=250, null=True, blank=True)
+    moveList = models.TextField(db_column='CRON_MOVE_LIST', null=True, blank=True)
 
     class Meta:
+        db_table = 'TEMP_CRON_CONTACTS_TOTAL'
         managed = False
-        db_table = 'tbl_temp_cron_userlist_total'
 
 
 class RegistrationLinkLogs(models.Model):
-    lnkId = models.BigAutoField(primary_key=True, db_column='lnk_id')
-    lnkLink = models.TextField(db_column='lnk_link', null=True, blank=True)
-    lnkExpiryDateTime = models.DateTimeField(db_column='lnk_expiry_date_time', null=True, blank=True)
-    lnkPlanId = models.BigIntegerField(db_column='lnk_plan_id', default=0)
-    lnkCountrySettingId = models.BigIntegerField(db_column='lnk_country_setting_id', default=0)
-    lnkDateTime = models.DateTimeField(db_column='lnk_date_time', null=True, blank=True)
+    lnkId = models.BigAutoField(primary_key=True, db_column='LNK_ID')
+    lnkLink = models.TextField(db_column='LNK_LINK', null=True, blank=True)
+    lnkExpiryDateTime = models.DateTimeField(db_column='LNK_EXPIRY_DATE_TIME', null=True, blank=True)
+    lnkPlanId = models.BigIntegerField(db_column='LNK_PLAN_ID', default=0)
+    lnkCountrySettingId = models.BigIntegerField(db_column='LNK_COUNTRY_SETTING_ID', default=0)
+    lnkDateTime = models.DateTimeField(db_column='LNK_DATE_TIME', null=True, blank=True)
 
     class Meta:
         managed = False
@@ -1059,12 +1047,12 @@ class EmailVerificationPrice(models.Model):
 
 
 class PlanModule(models.Model):
-    pmId = models.BigAutoField(primary_key=True, db_column='pm_id')
-    pmTitle = models.CharField(max_length=255, db_column='pm_title', null=True, blank=True)
+    pm_id = models.AutoField(db_column='PM_ID', primary_key=True)
+    pm_title = models.CharField(db_column='PM_TITLE', max_length=255, null=True, blank=True)
 
     class Meta:
+        db_table = 'PLAN_MODULES'
         managed = False
-        db_table = 'tbl_plan_module'
 
 
 class CancelRegistrationLog(models.Model):
@@ -1084,38 +1072,40 @@ class CancelRegistrationLog(models.Model):
 
 
 class TenDLCLogs(models.Model):
-    dlcId = models.BigAutoField(primary_key=True, db_column='dlc_id')
-    memberId = models.BigIntegerField(db_column='member_id', null=True, blank=True)
-    dlcStatus = models.CharField(max_length=255, db_column='dlc_status', null=True, blank=True)
-    dlcDate = models.DateTimeField(db_column='dlc_date', null=True, blank=True)
+    dlcId = models.BigAutoField(primary_key=True, db_column='TDL_ID')
+    memberId = models.BigIntegerField(db_column='TDL_CLIENT_ID', null=True, blank=True)
+    dlcStatus = models.CharField(max_length=255, db_column='TDL_STATUS', null=True, blank=True)
+    dlcDate = models.DateTimeField(db_column='TDL_DATE', null=True, blank=True)
+    tdlEmbedding = models.JSONField(null=True, blank=True, db_column='TDL_EMBEDDING')
 
     class Meta:
         managed = False
-        db_table = 'tbl_10dlc_logs'
+        db_table = 'TEN_DLC_LOGS'
 
 
 class TenDLCRenew(models.Model):
-    rnwId = models.BigAutoField(primary_key=True, db_column='rnw_id')
-    rnwMemberId = models.BigIntegerField(db_column='rnw_member_id', null=True, blank=True)
-    rnwContinue = models.CharField(max_length=255, db_column='rnw_continue', null=True, blank=True)
-    rnwDate = models.DateField(db_column='rnw_date', null=True, blank=True)
+    rnwId = models.BigAutoField(primary_key=True, db_column='TDR_ID')
+    rnwMemberId = models.BigIntegerField(db_column='TDR_CLIENT_ID', null=True, blank=True)
+    rnwContinue = models.CharField(max_length=255, db_column='TDR_CONTINUE', null=True, blank=True)
+    rnwDate = models.DateField(db_column='TDR_DATE', null=True, blank=True)
 
     class Meta:
         managed = False
-        db_table = 'tbl_10dlc_renew'
+        db_table = 'TEN_DLC_RENEW'
 
 
 class TenDLCData(models.Model):
-    datId = models.BigAutoField(primary_key=True, db_column='dat_id')
-    datMemberId = models.BigIntegerField(db_column='dat_member_id', null=True, blank=True)
-    datBrandName = models.CharField(max_length=255, db_column='dat_brand_name', null=True, blank=True)
-    datCampaignType = models.CharField(max_length=255, db_column='dat_campaign_type', null=True, blank=True)
-    datIsActive = models.CharField(max_length=255, db_column='dat_is_active', null=True, blank=True)
-    datRegistrationDate = models.DateField(db_column='dat_registration_date', null=True, blank=True)
+    datId = models.BigAutoField(primary_key=True, db_column='TDC_ID')
+    datMemberId = models.BigIntegerField(db_column='TDC_CLIENT_ID', null=True, blank=True)
+    datBrandName = models.CharField(max_length=255, db_column='TDC_BRAND_NAME', null=True, blank=True)
+    datCampaignType = models.CharField(max_length=255, db_column='TDC_CAMPAIGN_TYPE', null=True, blank=True)
+    datIsActive = models.CharField(max_length=255, db_column='TDC_IS_ACTIVE', null=True, blank=True)
+    datRegistrationDate = models.DateField(db_column='TDC_REGISTRATION_DATE', null=True, blank=True)
+    tdc_embedding = models.JSONField(null=True, blank=True, db_column='TDC_EMBEDDING')
 
     class Meta:
         managed = False
-        db_table = 'tbl_10dlc_data'
+        db_table = 'TEN_DLC_DATA'
 
 
 class PlanLogs(models.Model):
@@ -1143,33 +1133,33 @@ class MonthlyPrice(models.Model):
 
 
 class CampaignsSendEmail(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    campId = models.BigIntegerField(null=True, blank=True, db_column='camp_id')
-    campSendId = models.BigIntegerField(default=0, db_column='camp_send_id')
-    memberId = models.BigIntegerField(null=True, blank=True, db_column='member_id')
-    email = models.CharField(max_length=500, null=True, blank=True, db_column='email')
-    emailId = models.BigIntegerField(null=True, blank=True, db_column='email_id')
-    isSend = models.CharField(max_length=1, default='N', db_column='is_send')
-    isRead = models.CharField(max_length=1, null=True, blank=True, db_column='is_read')
-    isBounced = models.CharField(max_length=1, null=True, blank=True, db_column='is_bounced')
-    isUnsubscribed = models.CharField(max_length=1, null=True, blank=True, db_column='is_unsubscribed')
-    firstName = models.CharField(max_length=255, null=True, blank=True, db_column='first_name')
-    lastName = models.CharField(max_length=255, null=True, blank=True, db_column='last_name')
-    emailDomain = models.CharField(max_length=45, null=True, blank=True, db_column='email_domain')
-    csDefaultLanguage = models.CharField(max_length=255, default='en', db_column='cs_default_language')
-    smtpServerHost = models.CharField(max_length=255, null=True, blank=True, db_column='smtp_server_host')
-    isProcessed = models.CharField(max_length=1, default='N', db_column='is_processed')
-    emailQId = models.CharField(max_length=255, null=True, blank=True, db_column='email_q_id')
-    emailStatus = models.CharField(max_length=255, null=True, blank=True, db_column='email_status')
-    cronStatus = models.CharField(max_length=255, default='active', db_column='cron_status')
-    splitGroup = models.CharField(max_length=1, null=True, blank=True, db_column='split_group')
-    groupWinner = models.CharField(max_length=1, null=True, blank=True, db_column='group_winner')
-    msgPriority = models.IntegerField(default=0, db_column='msg_priority')
-    subMemberId = models.BigIntegerField(default=0, db_column='sub_member_id')
+    id = models.BigAutoField(db_column='CES_ID', primary_key=True)
+    campId = models.BigIntegerField(db_column='CES_CAMP_ID', null=True, blank=True)
+    campSendId = models.BigIntegerField(db_column='CES_SEND_ID', default=0)
+    memberId = models.BigIntegerField(db_column='CES_CLIENT_ID', null=True, blank=True)
+    email = models.CharField(db_column='CES_EMAIL', max_length=500, null=True, blank=True)
+    emailId = models.BigIntegerField(db_column='CES_EMAIL_ID', null=True, blank=True)
+    isSend = models.CharField(db_column='CES_IS_SEND', max_length=1, default='N')
+    isRead = models.CharField(db_column='CES_IS_READ', max_length=1, null=True, blank=True)
+    isBounced = models.CharField(db_column='CES_IS_BOUNCED', max_length=1, null=True, blank=True)
+    isUnsubscribed = models.CharField(db_column='CES_IS_UNSUBSCRIBED', max_length=1, null=True, blank=True)
+    firstName = models.CharField(db_column='CES_FIRST_NAME', max_length=255, null=True, blank=True)
+    lastName = models.CharField(db_column='CES_LAST_NAME', max_length=255, null=True, blank=True)
+    emailDomain = models.CharField(db_column='CES_EMAIL_DOMAIN', max_length=50, null=True, blank=True)
+    csDefaultLanguage = models.CharField(db_column='CES_CS_DEFAULT_LANGUAGE', max_length=50, default='en')
+    smtpServerHost = models.CharField(db_column='CES_SMTP_SERVER_HOST', max_length=50, null=True, blank=True)
+    isProcessed = models.CharField(db_column='CES_IS_PROCESSED', max_length=1, default='N')
+    emailQId = models.CharField(db_column='CES_EMAIL_Q_ID', max_length=255, null=True, blank=True)
+    emailStatus = models.CharField(db_column='CES_EMAIL_STATUS', max_length=255, null=True, blank=True)
+    cronStatus = models.CharField(db_column='CES_CRON_STATUS', max_length=255, default='active')
+    splitGroup = models.CharField(db_column='CES_SPLIT_GROUP', max_length=1, null=True, blank=True)
+    groupWinner = models.CharField(db_column='CES_GROUP_WINNER', max_length=1, null=True, blank=True)
+    msgPriority = models.IntegerField(db_column='CES_MSG_PRIORITY', default=0)
+    cesEmbedding = models.JSONField(null=True, blank=True, db_column='CES_EMBEDDING')
 
     class Meta:
+        db_table = 'CAMPAIGN_EMAIL_SENT'
         managed = False
-        db_table = 'tbl_campaign_send_email'
 
 
 class CampaignsSendEmailArchive(models.Model):
@@ -1203,53 +1193,85 @@ class CampaignsSendEmailArchive(models.Model):
 
 
 class AutomationSendContact(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    campaignId = models.BigIntegerField(null=True, blank=True, db_column='campaign_id')
-    status = models.CharField(max_length=255, null=True, blank=True, db_column='status')
+    id = models.BigAutoField(db_column='ASC_ID', primary_key=True)
+    automationId = models.BigIntegerField(db_column='ASC_AUT_ID')
+    automationMasterSendId = models.BigIntegerField(db_column='ASC_MASTER_SEND_ID', default=0)
+    memberId = models.BigIntegerField(db_column='ASC_CLIENT_ID')
+    email = models.CharField(db_column='ASC_EMAIL', max_length=500, null=True, blank=True)
+    emailId = models.BigIntegerField(db_column='ASC_EMAIL_ID', null=True, blank=True)
+    isSend = models.CharField(db_column='ASC_IS_SEND', max_length=1, default='N')
+    isRead = models.CharField(db_column='ASC_IS_READ', max_length=1, null=True, blank=True)
+    isBounced = models.CharField(db_column='ASC_IS_BOUNCED', max_length=1, null=True, blank=True)
+    isUnsubscribed = models.CharField(db_column='ASC_IS_UNSUBSCRIBED', max_length=1, null=True, blank=True)
+    firstName = models.CharField(db_column='ASC_FIRST_NAME', max_length=255, null=True, blank=True)
+    lastName = models.CharField(db_column='ASC_LAST_NAME', max_length=255, null=True, blank=True)
+    emailDomain = models.CharField(db_column='ASC_EMAIL_DOMAIN', max_length=45, null=True, blank=True)
+    csDefaultLanguage = models.CharField(db_column='ASC_CS_DEFAULT_LANGUAGE', max_length=255, default='en')
+    smtpServerHost = models.CharField(db_column='ASC_SMTP_SERVER_HOST', max_length=1, null=True, blank=True)
+    isProcessed = models.CharField(db_column='ASC_IS_PROCESSED', max_length=1, default='N')
+    emailQId = models.CharField(db_column='ASC_EMAIL_Q_ID', max_length=255, null=True, blank=True)
+    emailStatus = models.CharField(db_column='ASC_EMAIL_STATUS', max_length=255, null=True, blank=True)
+    cronStatus = models.CharField(db_column='ASC_CRON_STATUS', max_length=255, default='active')
+    splitGroup = models.CharField(db_column='ASC_SPLIT_GROUP', max_length=1, null=True, blank=True)
+    groupWinner = models.CharField(db_column='LCE_LINK_ID', max_length=1, null=True, blank=True)
+    msgPriority = models.IntegerField(db_column='ASC_MSG_PRIORITY', default=0)
+    campSendId = models.BigIntegerField(db_column='ASC_CAMP_SEND_ID', default=0)
+    sid = models.CharField(db_column='ASC_SID', max_length=255, null=True, blank=True)
+    smsStatus = models.CharField(db_column='ASC_SMS_STATUS', max_length=255, null=True, blank=True)
+    errorMessage = models.CharField(db_column='ASC_SMS_ERROR_MESSAGE', max_length=255, null=True, blank=True)
+    errorCode = models.CharField(db_column='ASC_ERROR_CODE', max_length=255, null=True, blank=True)
+    fromContact = models.CharField(db_column='ASC_FROM_CONTACT', max_length=255, null=True, blank=True)
+    toContact = models.CharField(db_column='ASC_TO_CONTACT', max_length=255, null=True, blank=True)
+    smsSendDate = models.DateTimeField(db_column='ASC_SEND_DATE', null=True, blank=True)
+    smsDetails = models.CharField(db_column='ASC_SMS_DETAILS', max_length=2000, null=True, blank=True)
+    ascEmbedding = models.JSONField(null=True, blank=True, db_column='ASC_EMBEDDING')
 
     class Meta:
+        db_table = 'AUTOMATION_SEND_CONTACT'
         managed = False
-        db_table = 'tbl_automation_send_contact'
 
 
 class CampaignLinks(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    campId = models.BigIntegerField(null=True, blank=True, db_column='camp_id')
-    campLink = models.TextField(null=True, blank=True, db_column='camp_link')
-    linkCount = models.IntegerField(default=0, db_column='link_count')
-    splitGroup = models.CharField(max_length=1, null=True, blank=True, db_column='split_group')
+    id = models.BigAutoField(db_column='CL_ID', primary_key=True)
+    campId = models.BigIntegerField(db_column='CL_CAMP_ID', null=True, blank=True)
+    campLink = models.TextField(db_column='CL_LINK', null=True, blank=True)
+    linkCount = models.IntegerField(db_column='CL_LINK_COUNT', default=0)
+    splitGroup = models.CharField(db_column='CL_SPLIT_GROUP', max_length=1, null=True, blank=True)
+    nodeId = models.BigIntegerField(db_column='CL_NODE_ID', null=True, blank=True)
+    automationEmailNodeDetails = models.CharField(db_column='CL_AUTOMATION_EMAIL_NODE_DETAILS', max_length=2000, null=True, blank=True)
+    clEmbedding = models.JSONField(null=True, blank=True, db_column='CL_EMBEDDING')
 
     class Meta:
+        db_table = 'CAMPAIGN_LINKS'
         managed = False
-        db_table = 'tbl_campaign_links'
 
 
 class CampaignLinkClick(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    userId = models.BigIntegerField(null=True, blank=True, db_column='user_id')
-    linkId = models.IntegerField(db_column='link_id')
-    linkCount = models.IntegerField(db_column='link_count')
-    city = models.CharField(max_length=255, null=True, blank=True, db_column='City')
-    clickDate = models.DateTimeField(null=True, blank=True, db_column='click_date')
-    sources = models.CharField(max_length=255, null=True, blank=True, db_column='sources')
-    sourceDetails = models.TextField(null=True, blank=True, db_column='source_details')
+    id = models.BigAutoField(db_column='ID_LINK', primary_key=True)
+    userId = models.BigIntegerField(db_column='USER_ID', null=True, blank=True)
+    linkId = models.IntegerField(db_column='LINK_ID', null=True, blank=True)
+    linkCount = models.IntegerField(db_column='LINK_COUNT', null=True, blank=True)
+    city = models.CharField(db_column='CITY', max_length=255, null=True, blank=True)
+    clickDate = models.DateTimeField(db_column='CLICK_DATE', null=True, blank=True)
+    sources = models.CharField(db_column='SOURCES', max_length=255, null=True, blank=True)
+    sourceDetails = models.CharField(db_column='SOURCE_DETAILS', max_length=2000, null=True, blank=True)
 
     class Meta:
+        db_table = 'TEMP_CAMP_LINK_CLICK'
         managed = False
-        db_table = 'tbl_camp_link_click'
 
 
 class CampaignSubscriber(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    campId = models.BigIntegerField(null=True, blank=True, db_column='camp_id')
-    subId = models.BigIntegerField(null=True, blank=True, db_column='sub_id')
-    totalOpen = models.BigIntegerField(null=True, blank=True, db_column='total_open')
-    lastOpened = models.DateTimeField(null=True, blank=True, db_column='last_opened')
-    osInfo = models.TextField(null=True, blank=True, db_column='os_info')
+    id = models.BigAutoField(db_column='CS_ID', primary_key=True)
+    campId = models.BigIntegerField(db_column='CS_CAMP_ID', null=True, blank=True)
+    subId = models.BigIntegerField(db_column='CS_CONTACT_ID', null=True, blank=True)
+    totalOpen = models.BigIntegerField(db_column='TOTAL_OPEN', null=True, blank=True)
+    lastOpened = models.DateTimeField(db_column='CS_LAST_OPENED', null=True, blank=True)
+    csIdEmbedding = models.JSONField(null=True, blank=True, db_column='CS_ID_EMBEDDING')
 
     class Meta:
+        db_table = 'CAMPAIGN_EMAIL_REPORTING'
         managed = False
-        db_table = 'tbl_campaign_subscriber'
 
 
 
