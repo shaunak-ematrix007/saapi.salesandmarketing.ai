@@ -15,7 +15,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 
 from common_app.models import (
     Member, CountrySetting, CampaignTransaction, Invoice,
-    MonthlyCurrentPlan, MonthlyPlanLogs, Plan,
+    Plan,
     Settings as GeneralSettings, SpTransLog, SpQuestions, SpOptions,
     SpReply, MemberStatus, Userlist
 )
@@ -435,21 +435,9 @@ def print_invoice(request: Request) -> CustomResponse:
             if print_invoice_response_dto.get("invMonthlySmsAmount", 0.0) > 0:
                 monthly_sms_yn = "Y"
                 
-            mpl_email = MonthlyPlanLogs.objects.filter(mplMemberId=member_id, mplInvId=inv_id).order_by('-mplPlanEmailQty').values_list('mplPlanEmailQty', flat=True).first() or 0
-            mpl_sms = MonthlyPlanLogs.objects.filter(mplMemberId=member_id, mplInvId=inv_id).order_by('-mplPlanSmsQty').values_list('mplPlanSmsQty', flat=True).first() or 0
-            mpl_social = MonthlyPlanLogs.objects.filter(mplMemberId=member_id, mplInvId=inv_id).order_by('-mplPlanSocialMediaQty').values_list('mplPlanSocialMediaQty', flat=True).first() or 0
-            
-            res_body["monthlyPlanLogs"] = {
-                "mplPlanEmailQty": mpl_email,
-                "mplPlanSmsQty": mpl_sms,
-                "mplPlanSocialmediaQty": mpl_social
-            }
         except Invoice.DoesNotExist:
             res_body["invoiceMonthly"] = []
-            res_body["monthlyPlanLogs"] = []
             
-
-
         res_body["campaign"] = get_serialized_transactions("campaign", member_id, inv_id)
         res_body["survey"] = get_serialized_transactions("survey", member_id, inv_id)
         res_body["assessment"] = get_serialized_transactions("assessment", member_id, inv_id)
@@ -570,74 +558,8 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
         survey_price_monthly = 0.0
         individual_price_monthly = 0.0
         social_media_price_monthly = 0.0
-        
-        # cp_email_qty = 0
-        # cp_sms_qty = 0
-        # cp_survey_qty = 0
-        # cp_form_qty = 0
-        # cp_social_media_qty = 0
-        
         monthly_yn = "N"
-        # un_inv = 0
-        
-        # cp_nt_mn_email_active = "N"
-        # cp_nt_mn_sms_active = "N"
-        # cp_nt_mn_survey_active = "N"
-        # cp_nt_mn_form_active = "N"
-        # cp_nt_mn_socialmedia_active = "N"
-        
-        # old_cp_survey_price = 0.0
-        # old_cp_form_price = 0.0
-        # old_cp_social_media_price = 0.0
-        
-        # old_cp_survey_qty = 0
-        # old_cp_form_qty = 0
-        # old_cp_social_media_qty = 0
-        
-        if member.planMonthlyYn in ["Y", "D"]:
-            # findOneActive
-            monthly_plan = MonthlyCurrentPlan.objects.filter(
-                models.Q(cpEmailActive="Y") | 
-                models.Q(cpSmsActive="Y") | 
-                models.Q(cpSurveyActive="Y") | 
-                models.Q(cpFormActive="Y") | 
-                models.Q(cpSocialMediaActive="Y"),
-                cpMemberId=member_id
-            ).order_by('-cpId').first()
-            
-            if monthly_plan:
-                # cp_nt_mn_email_active = monthly_plan.cpNtMnEmailActive
-                # cp_nt_mn_sms_active = monthly_plan.cpNtMnSmsActive
-                # cp_nt_mn_survey_active = monthly_plan.cpNtMnSurveyActive
-                # cp_nt_mn_form_active = monthly_plan.cpNtMnFormActive
-                # cp_nt_mn_socialmedia_active = monthly_plan.cpNtMnSocialMediaActive
-                #
-                # old_cp_survey_price = monthly_plan.cpSurveyPrice
-                # old_cp_form_price = monthly_plan.cpFormPrice
-                # old_cp_social_media_price = monthly_plan.cpSocialMediaPrice
-                #
-                # old_cp_survey_qty = monthly_plan.cpSurveyQty
-                # old_cp_form_qty = monthly_plan.cpFormQty
-                # old_cp_social_media_qty = monthly_plan.cpSocialMediaQty
-                
-                monthly_yn = "Y"
-                # un_inv = 1
-                
-                if monthly_plan.cpEmailActive == "Y":
-                    price_monthly = monthly_plan.cpEmailPrice
-                    # cp_email_qty = monthly_plan.cpEmailQty
-                if monthly_plan.cpSmsActive == "Y":
-                    sms_price_monthly = monthly_plan.cpSmsPrice
-                    # cp_sms_qty = monthly_plan.cpSmsQty
-                if monthly_plan.cpSurveyActive == "Y":
-                    survey_price_monthly = monthly_plan.cpSurveyPrice
-                    # cp_survey_qty = monthly_plan.cpSurveyQty
-                if monthly_plan.cpFormActive == "Y":
-                    individual_price_monthly = monthly_plan.cpFormPrice
-                    # cp_form_qty = monthly_plan.cpFormQty
-                    
-        # findCronDataMember
-        # select * from tbl_member where authorizeCustomerProfileId is not NULL and authorizeCustomerPaymentProfileId is not NULL and Member_Id=:memberId
+                   
         cron_members = Member.objects.filter(
             memberId=member_id,
             authorizeCustomerProfileId__isnull=False,
@@ -645,10 +567,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
         ).exclude(authorizeCustomerProfileId="").exclude(authorizeCustomerPaymentProfileId="")
         
         for m in cron_members:
-            # cc_delete_request = m.ccDeleteRequest
-            
-            # settingsRepository.findSettingsData()
-            # select * from tbl_settings limit 1
             settings_obj = GeneralSettings.objects.first()
             bill_period = 1
             if settings_obj and settings_obj.billPeriod:
@@ -659,12 +577,9 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                     bill_period = 1
                     
             try:
-                # update bill date
                 today = datetime.now()
-                # Java: Date bDate = bYear+"-"+bMonth+"-01 00:00:00";
                 b_date_str = f"{today.year}-{today.month:02d}-01 00:00:00"
                 b_date = CommonFunction.convertDate(b_date_str)
-                # updateBillDate
                 next_date = CommonFunction.addMonth(b_date, bill_period)
                 m.billDate = next_date.date()
                 m.save()
@@ -678,14 +593,11 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
             inv_client_name = f"{first_name} {last_name}"
             email = DecryptString.setEncDecUser(member.email, "display", "Y")
             
-            # max_invoiced_no = 0
             inv_first = "no"
             try:
-                # select max(invNo) from tbl_invoice where invCountryId=:countryId
                 country_str = member.country or "100"
                 max_no = Invoice.objects.filter(invCountryId=int(country_str)).aggregate(models.Max('invNo'))['invNo__max']
                 if max_no is not None and max_no > 0:
-                    # max_invoiced_no = int(max_no)
                     inv_first = "no"
                 else:
                     inv_first = "yes"
@@ -711,7 +623,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
             pi = 0.0
             psm = 0.0
             psmPoll = 0.0
-            # transflg = 0
             ptr = 0.0
             psom = 0.0
             psc = 0.0
@@ -728,7 +639,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
             totalSms = 0.0
             totalSmsPoll = 0.0
             totalPageTrans = 0.0
-            # totalSocialMedia = 0.0
             totalSMSConversations = 0.0
             totalCalling = 0.0
             totalSmsCalendar = 0.0
@@ -741,8 +651,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
             emailVerificationPrice = 0.0
             evp = 0.0
             
-            # findUninvoicedList
-            # SELECT * FROM tbl_campaign_transaction where Member_Id=:memberId and tranInvoicedStatus='uninvoiced' and tranBillType=0 order by tranId desc
             campaign_transactions = CampaignTransaction.objects.filter(
                 memberId=member_id,
                 tranInvoicedStatus="uninvoiced",
@@ -782,7 +690,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                     smsPollPrice += ct.tranTotalAmount
                     psmPoll = ct.tranMemberRate
                     
-                    # spReplyRepository.updateData
                     SpReply.objects.filter(
                         smsPollingId=ct.tranCampaignId,
                         fromNo=ct.tranPollFormNo,
@@ -790,7 +697,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                         tranId=0
                     ).update(tranId=ct.tranId)
                     
-                    # spTransLogRepository.updateData
                     SpTransLog.objects.filter(
                         smspollingId=ct.tranCampaignId,
                         fromNo=ct.tranPollFormNo,
@@ -859,18 +765,13 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                 format_double(emailVerificationPrice)
             )
             
-            # flag = 0
             if inv_first == "yes":
                 if amt < country_setting.cntyFirstInvFreeAmt:
-                    # flag = 1
                     pass
                     
             if monthly_yn == "Y":
                 amt += price_monthly + sms_price_monthly + survey_price_monthly + individual_price_monthly + social_media_price_monthly
-                # flag = 0
-                # transflg = 1
                 
-            # OVERRIDE matches Java logic exactly:
             amt = 1.0
             flag = 0
             transflg = 1
@@ -878,7 +779,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
             if flag == 0 and transflg == 1:
                 if amt >= country_setting.cntyInvLessAmtNotCharge:
                     inv_pay_card_no = ""
-                    # result_code = ""
                     inv_trans_id = ""
                     error_code = ""
                     error_message = ""
@@ -886,7 +786,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                     if member.membershipType == "Free":
                         result_code = "Ok"
                     else:
-                        # max_invoiced_no = 0
                         try:
                             country_str = member.country or "100"
                             max_no = Invoice.objects.filter(invCountryId=int(country_str)).aggregate(models.Max('invNo'))['invNo__max']
@@ -905,7 +804,6 @@ def create_invoice(request: Request, member_id: int) -> CustomResponse:
                         inv_trans_id = res_inner.get("invTransationId")
                         
                     if result_code == "Ok":
-                        # max_invoiced_no = 0
                         try:
                             country_str = member.country or "100"
                             max_no = Invoice.objects.filter(invCountryId=int(country_str)).aggregate(models.Max('invNo'))['invNo__max']
