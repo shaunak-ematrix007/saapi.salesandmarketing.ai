@@ -1,3 +1,4 @@
+from common_app.utils import get_client_id_by_tenant_id
 import logging
 import math
 from typing import Any, Dict
@@ -7,12 +8,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from auth_app.authentication import CustomJWTAuthentication
 from common_app.models import (
-    Member, SmtpServer, CampaignsEmailSend, CampaignsEmail,
+    SmtpServer, CampaignsEmailSend, CampaignsEmail, Tenants, Clients,
     CampaignsSendEmail, CampaignsSendEmailArchive, AutomationSendContact
 )
 from common_app.responses import CustomResponse
 from common_app.common_function import CommonFunction
-from common_app.decrypt_string import DecryptString
+from common_app.utils import *
 
 logger = logging.getLogger(__name__)
 
@@ -92,14 +93,14 @@ def get_campaign_wise_email_campaign_list(request: Request) -> CustomResponse:
                 camp_send_id = campaigns_email.id
 
                 # Retrieve Member and decrypt details
-                member = Member.objects.filter(memberId=campaigns_email.memberId).first()
+                member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(campaigns_email.memberId)).first()
                 member_name = None
                 company_name = None
                 if member:
-                    first_dec = DecryptString.setEncDecUser(member.firstName, "display", "Y") or ""
-                    last_dec = DecryptString.setEncDecUser(member.lastName, "display", "Y") or ""
+                    first_dec = member.ten_first_name or ""
+                    last_dec = member.ten_last_name or ""
                     member_name = f"{first_dec} {last_dec}".strip()
-                    company_name = DecryptString.setEncDecUser(member.companyName, "display", "Y")
+                    company_name = get_company_name(campaigns_email.memberId)
 
                 # Count sent/delivered stats
                 total_members = CampaignsSendEmail.objects.filter(campId=camp_id, campSendId=camp_send_id).count()
@@ -123,7 +124,7 @@ def get_campaign_wise_email_campaign_list(request: Request) -> CustomResponse:
 
                 email_campaign_dtos.append({
                     "campSendId": camp_send_id,
-                    "memberId": campaigns_email.memberId,
+                    "memberId": get_client_id_by_tenant_id(campaigns_email.memberId),
                     "memberName": member_name,
                     "companyName": company_name,
                     "campaignName": campaigns_email.campName,
@@ -243,7 +244,7 @@ def get_contact_list_by_camp_id(request: Request) -> CustomResponse:
 
         contact_dtos = []
         for campaign_send_email in paginated_contacts:
-            email_dec = DecryptString.setEncDecUser(campaign_send_email.email, "display", "Y")
+            email_dec = campaign_send_email.email
             contact_dtos.append({
                 "firstName": campaign_send_email.firstName,
                 "lastName": campaign_send_email.lastName,
@@ -368,11 +369,11 @@ def get_archive_email_campaign_list(request: Request) -> CustomResponse:
         limit = offset + size
 
         # Fetch member details
-        member = Member.objects.filter(memberId=member_id).first()
-        res_body["firstName"] = DecryptString.setEncDecUser(member.firstName, "display", "Y") if member else None
-        res_body["lastName"] = DecryptString.setEncDecUser(member.lastName, "display", "Y") if member else None
+        member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(member_id)).first()
+        res_body["firstName"] = member.ten_first_name if member else None
+        res_body["lastName"] = member.ten_last_name if member else None
 
-        queryset = CampaignsEmail.objects.filter(memberId=member_id, archiveYn='Y').order_by('campId')
+        queryset = CampaignsEmail.objects.filter(memberId=get_client_id_by_tenant_id(member_id), archiveYn='Y').order_by('campId')
 
         if search_key:
             queryset = queryset.filter(campName__icontains=search_key)
@@ -407,7 +408,7 @@ def get_archive_email_campaign_list(request: Request) -> CustomResponse:
         res_body["getSize"] = size
         res_body["emailCampaignsList"] = email_campaign_dtos
 
-        total_campaign = CampaignsEmail.objects.filter(memberId=member_id, archiveYn='Y').count()
+        total_campaign = CampaignsEmail.objects.filter(memberId=get_client_id_by_tenant_id(member_id), archiveYn='Y').count()
         res_body["totalCampaign"] = total_campaign
 
         return CustomResponse(data=res_body, status=200, message="Email Campaigns List Successfully Fetched")

@@ -241,7 +241,7 @@ class TenantDetails(models.Model):
 
     td_login_preference = models.CharField(max_length=255, db_column="TD_LOGIN_PREFERENCE", null=True, blank=True)
     td_google_authenticator_secret = models.CharField(max_length=2000, db_column="TD_GOOGLE_AUTHENTICATOR_SECRET", null=True, blank=True)
-    td_microsoft_authenticator_secret = models.CharField(max_length=2000, db_column="TD_MICROSOFT_AUTHENTICATOR_SECRET", null=True, blank=True)
+    td_microsoft_authenticator_secret = models.CharField(max_length=2000, db_column='"TD_MICROSOFT_AUTHENTICATOR_SECRET"', null=True, blank=True)
 
     td_registration_step = models.IntegerField(db_column="TD_REGISTRATION_STEP", default=0, null=True, blank=True)
 
@@ -263,8 +263,8 @@ class TenantDetails(models.Model):
     td_auth_key = models.CharField(max_length=2000, db_column="TD_AUTH_KEY", null=True, blank=True)
     td_auth_token = models.CharField(max_length=2000, db_column="TD_AUTH_TOKEN", null=True, blank=True)
 
-    td_authorize_customer_profile_id = models.CharField(max_length=255, db_column="TD_AUTHORIZE_CUSTOMER_PROFILE_ID", null=True, blank=True)
-    td_authorize_customer_payment_profile_id = models.CharField(max_length=255, db_column="TD_AUTHORIZE_CUSTOMER_PAYMENT_PROFILE_ID", null=True, blank=True)
+    td_authorize_customer_profile_id = models.CharField(max_length=255, db_column='"TD_AUTHORIZE_CUSTOMER_PROFILE_ID"', null=True, blank=True)
+    td_authorize_customer_payment_profile_id = models.CharField(max_length=255, db_column='"TD_AUTHORIZE_CUSTOMER_PAYMENT_PROFILE_ID"', null=True, blank=True)
     td_bill_date = models.DateTimeField(db_column="TD_BILL_DATE", null=True, blank=True)
     td_creditcard_status = models.CharField(max_length=250, db_column="TD_CREDITCARD_STATUS", null=True, blank=True)
     td_creditcard_error = models.CharField(max_length=250, db_column="TD_CREDITCARD_ERROR", null=True, blank=True)
@@ -1095,19 +1095,20 @@ class PlanModule(models.Model):
 
 
 class CancelRegistrationLog(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    username = models.CharField(max_length=255, null=True, blank=True, db_column='username')
-    firstName = models.CharField(max_length=255, null=True, blank=True, db_column='first_name')
-    lastName = models.CharField(max_length=255, null=True, blank=True, db_column='last_name')
-    email = models.CharField(max_length=255, null=True, blank=True, db_column='email')
-    cell = models.CharField(max_length=255, null=True, blank=True, db_column='cell')
-    step = models.IntegerField(default=1, db_column='step')
-    createdDate = models.DateTimeField(null=True, blank=True, db_column='created_date')
-    status = models.CharField(max_length=255, default='Leaving', db_column='status')
+    id = models.BigAutoField(primary_key=True, db_column='RL_ID')
+    username = models.CharField(max_length=255, null=True, blank=True, db_column='RL_USERNAME')
+    firstName = models.CharField(max_length=255, null=True, blank=True, db_column='RL_FIRST_NAME')
+    lastName = models.CharField(max_length=255, null=True, blank=True, db_column='RL_LAST_NAME')
+    email = models.CharField(max_length=255, null=True, blank=True, db_column='RL_EMAIL')
+    cell = models.CharField(max_length=255, null=True, blank=True, db_column='RL_CELL')
+    step = models.IntegerField(default=1, db_column='RL_STEP')
+    createdDate = models.DateTimeField(null=True, blank=True, db_column='RL_CREATED_DATE')
+    status = models.CharField(max_length=255, default='Leaving', db_column='RL_STATUS')
+    country = models.CharField(max_length=25, db_column='RL_COUNTRY')
 
     class Meta:
         managed = False
-        db_table = 'tbl_registration_logs'
+        db_table = 'REGISTRATION_STEPS'
 
 
 class TenDLCLogs(models.Model):
@@ -1202,33 +1203,33 @@ class CampaignsSendEmail(models.Model):
 
 
 class CampaignsSendEmailArchive(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column='id')
-    campId = models.BigIntegerField(null=True, blank=True, db_column='camp_id')
-    campSendId = models.BigIntegerField(default=0, db_column='camp_send_id')
-    memberId = models.BigIntegerField(null=True, blank=True, db_column='member_id')
-    email = models.CharField(max_length=500, null=True, blank=True, db_column='email')
-    emailId = models.BigIntegerField(null=True, blank=True, db_column='email_id')
-    isSend = models.CharField(max_length=1, default='N', db_column='is_send')
-    isRead = models.CharField(max_length=1, null=True, blank=True, db_column='is_read')
-    isBounced = models.CharField(max_length=1, null=True, blank=True, db_column='is_bounced')
-    isUnsubscribed = models.CharField(max_length=1, null=True, blank=True, db_column='is_unsubscribed')
-    firstName = models.CharField(max_length=255, null=True, blank=True, db_column='first_name')
-    lastName = models.CharField(max_length=255, null=True, blank=True, db_column='last_name')
-    emailDomain = models.CharField(max_length=45, null=True, blank=True, db_column='email_domain')
-    csDefaultLanguage = models.CharField(max_length=255, default='en', db_column='cs_default_language')
-    smtpServerHost = models.CharField(max_length=255, null=True, blank=True, db_column='smtp_server_host')
-    isProcessed = models.CharField(max_length=1, default='N', db_column='is_processed')
-    emailQId = models.CharField(max_length=255, null=True, blank=True, db_column='email_q_id')
-    emailStatus = models.CharField(max_length=255, null=True, blank=True, db_column='email_status')
-    cronStatus = models.CharField(max_length=255, default='active', db_column='cron_status')
-    splitGroup = models.CharField(max_length=1, null=True, blank=True, db_column='split_group')
-    groupWinner = models.CharField(max_length=1, null=True, blank=True, db_column='group_winner')
-    msgPriority = models.IntegerField(default=0, db_column='msg_priority')
-    subMemberId = models.BigIntegerField(default=0, db_column='sub_member_id')
+    id = models.BigAutoField(primary_key=True, db_column='SEA_ID')
+    campId = models.BigIntegerField(null=True, blank=True, db_column='SEA_CAMP_ID')
+    campSendId = models.BigIntegerField(default=0, db_column='SEA_CAMP_SEND_ID')
+    memberId = models.BigIntegerField(null=True, blank=True, db_column='SEA_CLIENT_ID')
+    email = models.CharField(max_length=500, null=True, blank=True, db_column='SEA_EMAIL')
+    emailId = models.BigIntegerField(null=True, blank=True, db_column='SEA_EMAIL_ID')
+    isSend = models.CharField(max_length=1, default='N', db_column='SEA_IS_SEND')
+    isRead = models.CharField(max_length=1, null=True, blank=True, db_column='SEA_IS_READ')
+    isBounced = models.CharField(max_length=1, null=True, blank=True, db_column='SEA_IS_BOUNCED')
+    isUnsubscribed = models.CharField(max_length=1, null=True, blank=True, db_column='SEA_IS_UNSUBSCRIBED')
+    firstName = models.CharField(max_length=255, null=True, blank=True, db_column='SEA_FIRST_NAME')
+    lastName = models.CharField(max_length=255, null=True, blank=True, db_column='SEA_LAST_NAME')
+    emailDomain = models.CharField(max_length=45, null=True, blank=True, db_column='SEA_EMAIL_DOMAIN')
+    csDefaultLanguage = models.CharField(max_length=255, default='en', db_column='SEA_CS_DEFAULT_LANGUAGE')
+    smtpServerHost = models.CharField(max_length=255, null=True, blank=True, db_column='SEA_SMTP_SERVER_HOST')
+    isProcessed = models.CharField(max_length=1, default='N', db_column='SEA_IS_PROCESSED')
+    emailQId = models.CharField(max_length=255, null=True, blank=True, db_column='SEA_EMAIL_Q_ID')
+    emailStatus = models.CharField(max_length=255, null=True, blank=True, db_column='SEA_EMAIL_STATUS')
+    cronStatus = models.CharField(max_length=255, default='active', db_column='SEA_CRON_STATUS')
+    splitGroup = models.CharField(max_length=1, null=True, blank=True, db_column='SEA_SPLIT_GROUP')
+    groupWinner = models.CharField(max_length=1, null=True, blank=True, db_column='SEA_GROUP_WINNER')
+    msgPriority = models.IntegerField(default=0, db_column='SEA_MSG_PRIORITY')
+    seaEmbeddings = models.JSONField(null=True, blank=True, db_column='SEA_EMBEDDINGS')
 
     class Meta:
         managed = False
-        db_table = 'tbl_campaign_send_email_archive'
+        db_table = 'CAMPAIGN_SEND_EMAIL_ARCHIVE'
 
 
 class AutomationSendContact(models.Model):

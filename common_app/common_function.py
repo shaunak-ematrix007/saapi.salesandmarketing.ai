@@ -434,8 +434,8 @@ class CommonFunction:
 
     @staticmethod
     def getFinalMemberId(member):
-        parentMemberId = member.parentMemberId
-        memberId = member.memberId
+        parentMemberId = member.ten_parent_id
+        memberId = member.ten_id
         if parentMemberId and parentMemberId > 0:
             memberId = parentMemberId
         return memberId

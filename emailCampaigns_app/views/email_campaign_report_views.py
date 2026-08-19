@@ -1,3 +1,4 @@
+from common_app.utils import get_tenant_id_by_client_id
 import logging
 import math
 from django.db.models import Count
@@ -7,9 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from auth_app.authentication import CustomJWTAuthentication
 from common_app.models import (
-    Member, CampaignsEmailSend, CampaignsSendEmail, CampaignsSendEmailArchive,
+    Tenants, CampaignsEmailSend, CampaignsSendEmail, CampaignsSendEmailArchive,
     CampaignLinks, CampaignLinkClick, CampaignSubscriber, Group, Userlist
 )
+from common_app.utils import *
 from common_app.responses import CustomResponse
 from common_app.common_function import CommonFunction
 from common_app.decrypt_string import DecryptString
@@ -36,20 +38,20 @@ def get_email_campaigns_report_list_page(request: Request) -> CustomResponse:
         camp_id = int(camp_id_param)
         member_id = int(member_id_param)
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(ten_id=get_tenant_id_by_client_id(member_id)).first()
         if not member:
             return CustomResponse(data=res_body, status=404, message="Member not found")
 
         final_member_id = CommonFunction.getFinalMemberId(member)
-        final_member = Member.objects.filter(memberId=final_member_id).first()
-        tempt_time_zone = final_member.timeZone if final_member else ""
+        final_member = Tenants.objects.select_related('details').filter(ten_id=final_member_id).first()
+        tempt_time_zone = get_client_time_zone(get_client_id_by_tenant_id(final_member_id)) if final_member else None
         if not tempt_time_zone:
             tempt_time_zone = time_zone_param
 
         offset = page * size
         limit = offset + size
 
-        queryset = CampaignsEmailSend.objects.filter(memberId=final_member_id, campId=camp_id).order_by('id')
+        queryset = CampaignsEmailSend.objects.filter(memberId=get_client_id_by_tenant_id(final_member_id), campId=camp_id).order_by('id')
 
         if search_key:
             queryset = queryset.filter(campName__icontains=search_key)
@@ -108,13 +110,13 @@ def get_email_campaigns_report_dashboard(request: Request) -> CustomResponse:
         member_id = int(member_id_param)
         dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(memberId=get_tenant_id_by_client_id(member_id)).first()
         if not member:
             return CustomResponse(data=res_body, status=404, message="Member not found")
 
         final_member_id = CommonFunction.getFinalMemberId(member)
-        final_member = Member.objects.filter(memberId=final_member_id).first()
-        tempt_time_zone = final_member.timeZone if final_member else ""
+        final_member = Tenants.objects.select_related('details').filter(ten_id=final_member_id).first()
+        tempt_time_zone = get_client_time_zone(get_client_id_by_tenant_id(final_member_id)) if final_member else None
         if not tempt_time_zone:
             tempt_time_zone = time_zone_param
 
@@ -410,12 +412,12 @@ def get_email_campaigns_report_members_list_page(request: Request) -> CustomResp
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
         final_member_id = None
         if member_id_param:
             member_id = int(member_id_param)
-            member = Member.objects.filter(memberId=member_id).first()
+            member = Tenants.objects.select_related('details').filter(memberId=get_tenant_id_by_client_id(member_id)).first()
             if member:
                 final_member_id = CommonFunction.getFinalMemberId(member)
 
@@ -436,7 +438,7 @@ def get_email_campaigns_report_members_list_page(request: Request) -> CustomResp
 
         campaigns_send_email_dto_list = []
         for campaigns_send_email in paginated_members:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             if final_member_id is not None:
@@ -580,9 +582,9 @@ def get_email_campaigns_report_members_list(request: Request) -> CustomResponse:
             return CustomResponse(data=res_body, status=400, message="Missing memberId or campId")
 
         member_id = int(member_id_param)
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(memberId=get_tenant_id_by_client_id(member_id)).first()
         final_member_id = CommonFunction.getFinalMemberId(member) if member else member_id
 
         camp_name_val = CampaignsEmailSend.objects.filter(id=dec_camp_id).values_list('campName', flat=True).first()
@@ -590,7 +592,7 @@ def get_email_campaigns_report_members_list(request: Request) -> CustomResponse:
 
         campaigns_email_send_list = CampaignsSendEmailArchive.objects.filter(campSendId=dec_camp_id).order_by('firstName')
         for campaigns_send_email in campaigns_email_send_list:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             unsubscribe_user = Userlist.objects.filter(
@@ -676,9 +678,9 @@ def get_campaigns_report_print(request: Request) -> CustomResponse:
             return CustomResponse(data=res_body, status=400, message="Missing memberId or campId")
 
         member_id = int(member_id_param)
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(memberId=get_tenant_id_by_client_id(member_id)).first()
         final_member_id = CommonFunction.getFinalMemberId(member) if member else member_id
 
         # Product Links

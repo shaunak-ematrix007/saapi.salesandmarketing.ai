@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 def serialize_member_dto(tenant: Tenants) -> Dict[str, Any]:
     """Helper to serialize Tenant properties for list views matching MemberDto.java contract."""
     email = tenant.ten_email
-    first_name = DecryptString.setEncDecUser(tenant.ten_first_name, "display", "Y") or ""
-    last_name = DecryptString.setEncDecUser(tenant.ten_last_name, "display", "Y") or ""
-    cell = DecryptString.setEncDecUser(tenant.ten_cell_phone, "display", "Y") or ""
+    first_name = tenant.ten_first_name
+    last_name = tenant.ten_last_name
+    cell = tenant.ten_cell_phone
     
     member_type = "SubUser" if tenant.ten_parent_id and tenant.ten_parent_id > 0 else "User"
     
@@ -57,7 +57,7 @@ def serialize_member_dto(tenant: Tenants) -> Dict[str, Any]:
         except ValueError:
             pass
             
-    username = DecryptString.setEncDecUser(tenant.ten_username, "display", "Y") or ""
+    username = tenant.ten_username
     
     return {
         "memberId": tenant.ten_id,
@@ -82,21 +82,21 @@ def serialize_member_full(tenant: Tenants) -> Dict[str, Any]:
     return {
         "memberId": tenant.ten_id,
         "membershipType": details.td_membership_type if details else "",
-        "password": DecryptString.setEncDecUser(details.td_password if details else "", "display", "Y") or "",
+        "password": details.td_password if details else "",
         "companyName": "", 
-        "firstName": DecryptString.setEncDecUser(tenant.ten_first_name, "display", "Y") or "",
-        "lastName": DecryptString.setEncDecUser(tenant.ten_last_name, "display", "Y") or "",
-        "memberFullName": f"{DecryptString.setEncDecUser(tenant.ten_first_name, 'display', 'Y') or ''} {DecryptString.setEncDecUser(tenant.ten_last_name, 'display', 'Y') or ''}".strip(),
-        "address": DecryptString.setEncDecUser(tenant.ten_street_address1, "display", "Y") or "",
-        "streetAddress": DecryptString.setEncDecUser(tenant.ten_street_address2, "display", "Y") or "",
-        "city": DecryptString.setEncDecUser(tenant.ten_city, "display", "Y") or "",
-        "state": DecryptString.setEncDecUser(tenant.ten_state, "display", "Y") or "",
-        "postCode": DecryptString.setEncDecUser(tenant.ten_post_code, "display", "Y") or "",
+        "firstName": tenant.ten_first_name,
+        "lastName": tenant.ten_last_name,
+        "memberFullName": f"{tenant.ten_first_name} {tenant.ten_last_name}".strip(),
+        "address": tenant.ten_street_address1,
+        "streetAddress": tenant.ten_street_address2,
+        "city": tenant.ten_city,
+        "state": tenant.ten_state,
+        "postCode": tenant.ten_post_code,
         "country": tenant.ten_country if tenant.ten_country is not None else "",
-        "phone": DecryptString.setEncDecUser(tenant.ten_phone, "display", "Y") or "",
+        "phone": tenant.ten_phone,
         "fax": "", 
-        "cell": DecryptString.setEncDecUser(tenant.ten_cell_phone, "display", "Y") or "",
-        "email": DecryptString.setEncDecUser(tenant.ten_email, "display", "Y") or "",
+        "cell": tenant.ten_cell_phone,
+        "email": tenant.ten_email,
         "memberStatus": tenant.ten_status,
         "businessName": "",
         "websiteName": "",
@@ -104,15 +104,15 @@ def serialize_member_full(tenant: Tenants) -> Dict[str, Any]:
         "is2FA": details.td_is2fa if details else 0,
         "dateRegistered": str(tenant.ten_date_registered) if tenant.ten_date_registered else None,
         "lastLoggedin": str(tenant.ten_last_logon) if tenant.ten_last_logon else None,
-        "authorizeCustomerPaymentProfileId": DecryptString.setEncDecUser(details.td_authorize_customer_payment_profile_id if details else "", "display", "Y") or "",
-        "authorizeCustomerProfileId": DecryptString.setEncDecUser(details.td_authorize_customer_profile_id if details else "", "display", "Y") or "",
+        "authorizeCustomerPaymentProfileId": details.td_authorize_customer_payment_profile_id if details else "",
+        "authorizeCustomerProfileId": details.td_authorize_customer_profile_id if details else "",
         "billDate": str(details.td_bill_date) if details and details.td_bill_date else None,
         "memberDefaultLanguage": tenant.ten_default_language,
         "optin": details.td_opt_in if details else None,
         "parentMemberId": tenant.ten_parent_id,
-        "secAns1": DecryptString.setEncDecUser(details.td_sec_ans_1 if details else "", "display", "Y") or "",
-        "secAns2": DecryptString.setEncDecUser(details.td_sec_ans_2 if details else "", "display", "Y") or "",
-        "secAns3": DecryptString.setEncDecUser(details.td_sec_ans_3 if details else "", "display", "Y") or "",
+        "secAns1": details.td_sec_ans_1 if details else "",
+        "secAns2": details.td_sec_ans_2 if details else "",
+        "secAns3": details.td_sec_ans_3 if details else "",
         "secQus1": details.td_sec_qus_1 if details else 0,
         "secQus2": details.td_sec_qus_2 if details else 0,
         "secQus3": details.td_sec_qus_3 if details else 0,
@@ -122,7 +122,7 @@ def serialize_member_full(tenant: Tenants) -> Dict[str, Any]:
         "authKey": details.td_auth_key if details else "",
         "authToken": details.td_auth_token if details else "",
         "enableApi": details.td_enable_api if details else "N",
-        "username": DecryptString.setEncDecUser(tenant.ten_username, "display", "Y") or "",
+        "username": tenant.ten_username,
         "loginPreference": details.td_login_preference if details else ""
     }
 

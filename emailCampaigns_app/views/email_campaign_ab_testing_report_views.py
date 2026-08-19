@@ -10,22 +10,22 @@ from rest_framework.permissions import IsAuthenticated
 
 from auth_app.authentication import CustomJWTAuthentication
 from common_app.models import (
-    Member, CampaignsEmailSend, CampaignsSendEmail, CampaignsSendEmailArchive,
+    Tenants, CampaignsEmailSend, CampaignsSendEmail, CampaignsSendEmailArchive,
     CampaignLinks, CampaignLinkClick, CampaignSubscriber, Group, Userlist,
     SmtpServer, CampaignTransaction, CountrySetting, CampaignsEmail
 )
+from common_app.utils import *
 from common_app.responses import CustomResponse
 from common_app.common_function import CommonFunction
-from common_app.decrypt_string import DecryptString
 
 logger = logging.getLogger(__name__)
 
 
 def country_setting_by_member_id(member_id: int) -> Optional[CountrySetting]:
     if member_id > 0:
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(ten_id=member_id).first()
         if member:
-            country_id = member.country
+            country_id = member.ten_country
             if not country_id:
                 country_id = "100"
             plan_id = member.planId
@@ -203,7 +203,7 @@ def print_members(final_member_id: int, id_val: int, camp_id: int, split_group: 
     try:
         campaigns_email_send_list = CampaignsSendEmailArchive.objects.filter(campSendId=camp_id, splitGroup=split_group)
         for campaigns_send_email in campaigns_email_send_list:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             unsubscribe_user = Userlist.objects.filter(
@@ -268,15 +268,15 @@ def get_email_campaigns_report_dashboard_ab(request: Request) -> CustomResponse:
             return CustomResponse(data=res_body, status=400, message="Missing required parameters")
 
         member_id = int(member_id_param)
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(memberId=get_tenant_id_by_client_id(member_id)).first()
         if not member:
             return CustomResponse(data=res_body, status=404, message="Member not found")
 
         final_member_id = CommonFunction.getFinalMemberId(member)
-        final_member = Member.objects.filter(memberId=final_member_id).first()
-        tempt_time_zone = final_member.timeZone if final_member else ""
+        final_member = Tenants.objects.select_related('details').filter(ten_id=final_member_id).first()
+        tempt_time_zone = get_client_time_zone(get_client_id_by_tenant_id(final_member_id)) if final_member else None
         if not tempt_time_zone:
             tempt_time_zone = time_zone_param
 
@@ -570,7 +570,7 @@ def get_email_campaigns_report_product_links_ab(request: Request) -> CustomRespo
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
         id_val = int(id_param) if id_param else 0
 
         res_body["productLinks"] = report_product_links(id_val, dec_camp_id, "A")
@@ -599,11 +599,11 @@ def get_email_campaigns_report_members_list_page_ab(request: Request) -> CustomR
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
         final_member_id = None
         if member_id_param:
-            member = Member.objects.filter(memberId=int(member_id_param)).first()
+            member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(int(member_id_param))).first()
             if member:
                 final_member_id = CommonFunction.getFinalMemberId(member)
 
@@ -624,7 +624,7 @@ def get_email_campaigns_report_members_list_page_ab(request: Request) -> CustomR
 
         campaigns_send_email_dto_list = []
         for campaigns_send_email in paginated_members:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             if final_member_id is not None:
@@ -698,11 +698,11 @@ def get_email_campaigns_report_members_b_list_page_ab(request: Request) -> Custo
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
         final_member_id = None
         if member_id_param:
-            member = Member.objects.filter(memberId=int(member_id_param)).first()
+            member = Tenants.objects.select_related("details").filter(ten_id=int(get_client_id_by_tenant_id(int(member_id_param)))).first()
             if member:
                 final_member_id = CommonFunction.getFinalMemberId(member)
 
@@ -723,7 +723,7 @@ def get_email_campaigns_report_members_b_list_page_ab(request: Request) -> Custo
 
         campaigns_send_email_dto_list = []
         for campaigns_send_email in paginated_members:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             if final_member_id is not None:
@@ -797,11 +797,11 @@ def get_email_campaigns_report_members_o_list_page_ab(request: Request) -> Custo
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
         final_member_id = None
         if member_id_param:
-            member = Member.objects.filter(memberId=int(member_id_param)).first()
+            member = Tenants.objects.select_related("details").filter(ten_id=int(get_client_id_by_tenant_id(int(member_id_param)))).first()
             if member:
                 final_member_id = CommonFunction.getFinalMemberId(member)
 
@@ -822,7 +822,7 @@ def get_email_campaigns_report_members_o_list_page_ab(request: Request) -> Custo
 
         campaigns_send_email_dto_list = []
         for campaigns_send_email in paginated_members:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             if final_member_id is not None:
@@ -892,7 +892,7 @@ def get_email_campaigns_report_sources_ab(request: Request) -> CustomResponse:
         if not camp_id_encrypted:
             return CustomResponse(data=res_body, status=400, message="Missing campId")
 
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
         id_val = int(id_param) if id_param else 0
 
         res_body["sourceLinks"] = report_sources(id_val, dec_camp_id, "A")
@@ -919,10 +919,10 @@ def get_campaigns_report_print_ab(request: Request) -> CustomResponse:
             return CustomResponse(data=res_body, status=400, message="Missing required parameters")
 
         member_id = int(member_id_param)
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
         id_val = int(id_param) if id_param else 0
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related("details").filter(ten_id=int(get_client_id_by_tenant_id(int(member_id_param)))).first()
         final_member_id = CommonFunction.getFinalMemberId(member) if member else member_id
 
         res_body["productLinks"] = print_product_link(final_member_id, id_val, dec_camp_id, "A")
@@ -956,7 +956,7 @@ def set_choose_winner(request: Request) -> CustomResponse:
         if not camp_id_encrypted or not winner or sub_member_id_param is None:
             return CustomResponse(data=res_body, status=400, message="Missing required parameters")
 
-        camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        camp_id = int(camp_id_encrypted)
         sub_member_id = int(sub_member_id_param)
 
         smtp_servers = SmtpServer.objects.filter(isActive=1)
@@ -1024,8 +1024,8 @@ def set_choose_winner(request: Request) -> CustomResponse:
             # getMemberListCount
             member_list = CampaignsSendEmail.objects.filter(groupWinner='A', subMemberId=sub_member_id, campSendId=camp_id, splitGroup='O').count()
 
-            member = Member.objects.filter(memberId=campaigns_email_send.memberId).first()
-            country_setting = country_setting_by_member_id(member.memberId) if member else None
+            member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(campaigns_email_send.memberId)).first()
+            country_setting = country_setting_by_member_id(member.ten_id) if member else None
             total_amount = CommonFunction.campaignPriceListDisplay(member_list, country_setting) if country_setting else 0.0
             member_rate = CommonFunction.campaignPriceListPer(member_list, country_setting) if country_setting else 0.0
 
@@ -1082,8 +1082,8 @@ def set_choose_winner(request: Request) -> CustomResponse:
             # getMemberListCount
             member_list = CampaignsSendEmail.objects.filter(groupWinner='B', subMemberId=sub_member_id, campSendId=camp_id, splitGroup='O').count()
 
-            member = Member.objects.filter(memberId=campaigns_email_send.memberId).first()
-            country_setting = country_setting_by_member_id(member.memberId) if member else None
+            member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(campaigns_email_send.memberId)).first()
+            country_setting = country_setting_by_member_id(member.ten_id) if member else None
             total_amount = CommonFunction.campaignPriceListDisplay(member_list, country_setting) if country_setting else 0.0
             member_rate = CommonFunction.campaignPriceListPer(member_list, country_setting) if country_setting else 0.0
 
@@ -1159,9 +1159,9 @@ def get_email_campaigns_report_members_list_ab(request: Request) -> CustomRespon
             return CustomResponse(data=res_body, status=400, message="Missing required parameters")
 
         member_id = int(member_id_param)
-        dec_camp_id = int(DecryptString.setEncDecUser(camp_id_encrypted, "display", "Y"))
+        dec_camp_id = int(camp_id_encrypted)
 
-        member = Member.objects.filter(memberId=member_id).first()
+        member = Tenants.objects.select_related('details').filter(ten_id=get_client_id_by_tenant_id(member_id)).first()
         final_member_id = CommonFunction.getFinalMemberId(member) if member else member_id
 
         camp_name_val = CampaignsEmailSend.objects.filter(id=dec_camp_id).values_list('campName', flat=True).first()
@@ -1169,7 +1169,7 @@ def get_email_campaigns_report_members_list_ab(request: Request) -> CustomRespon
 
         campaigns_email_send_list = CampaignsSendEmailArchive.objects.filter(campSendId=dec_camp_id, splitGroup=split_group).order_by('firstName')
         for campaigns_send_email in campaigns_email_send_list:
-            email_dec = DecryptString.setEncDecUser(campaigns_send_email.email, "display", "Y")
+            email_dec = campaigns_send_email.email
 
             unsubscribe_date_str = ""
             unsubscribe_user = Userlist.objects.filter(

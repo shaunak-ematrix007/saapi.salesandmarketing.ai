@@ -122,3 +122,15 @@ def get_client_timezone(tenant_id):
             return "UTC"
     except Clients.DoesNotExist:
         return "UTC"
+
+def get_company_name(tenant_id):
+    client = Clients.objects.filter(cliTenantId=tenant_id).first()
+    if client:
+        return client.cliBusinessName
+    return None
+
+def get_client_time_zone(client_id):
+    client = Clients.objects.filter(cliId=client_id).first()
+    if client:
+        return client.cliTimeZone
+    return None

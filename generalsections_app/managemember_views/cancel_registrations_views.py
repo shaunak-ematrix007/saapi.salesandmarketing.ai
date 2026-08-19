@@ -10,7 +10,6 @@ from auth_app.authentication import CustomJWTAuthentication
 from common_app.models import CancelRegistrationLog
 from common_app.responses import CustomResponse
 from common_app.common_function import CommonFunction
-from common_app.decrypt_string import DecryptString
 
 logger = logging.getLogger(__name__)
 
@@ -58,13 +57,11 @@ def get_cancel_registrations_list_page(request: Request) -> CustomResponse:
         queryset = CancelRegistrationLog.objects.all().order_by('id')
 
         if search_key:
-            # Match the Java behavior of encrypting the search term before querying
-            search_key_enc = DecryptString.setEncDecUser(search_key, "", "Y")
             queryset = queryset.filter(
-                Q(firstName__icontains=search_key_enc) |
-                Q(lastName__icontains=search_key_enc) |
-                Q(email__icontains=search_key_enc) |
-                Q(username__icontains=search_key_enc)
+                Q(firstName__icontains=search_key) |
+                Q(lastName__icontains=search_key) |
+                Q(email__icontains=search_key) |
+                Q(username__icontains=search_key)
             )
 
         total_records = CancelRegistrationLog.objects.count()
