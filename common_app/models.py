@@ -284,7 +284,7 @@ class Clients(models.Model):
     cliLogo = models.CharField(db_column='CLI_LOGO', max_length=500, null=True, blank=True)
     cliCustomerFooter = models.CharField(db_column='CLI_CUSTOMER_FOOTER', max_length=500, null=True, blank=True)
     cliLinkedin = models.CharField(db_column='CLI_LINKEDIN', max_length=100, null=True, blank=True)
-    cliRevenue = models.DecimalField(db_column='CLI_REVENE', max_digits=10, decimal_places=2, null=True, blank=True)
+    cliRevenue = models.DecimalField(db_column='CLI_REVENUE', max_digits=10, decimal_places=2, null=True, blank=True)
     cliNumEmployees = models.DecimalField(db_column='CLI_NUM_EMPLOYEES', max_digits=10, decimal_places=2, null=True, blank=True)
     cliStockTicker = models.CharField(db_column='CLI_STOCK_TICKER', max_length=25, null=True, blank=True)
     cli10DlcStatus = models.CharField(db_column='CLI_10DLC_STATUS', max_length=25, null=True, blank=True)
@@ -331,7 +331,7 @@ class CountrySetting(models.Model):
     cntyFirstInvFreeAmt = models.FloatField(db_column='CNTY_FIRST_INV_FREE_AMT', default=0.0)
     cntyInvLessAmtNotCharge = models.FloatField(db_column='CNTY_INV_LESS_AMT_NOT_CHARGE', default=0.0)
     cntyTranslateCharCharge = models.FloatField(db_column='CNTY_TRANSLATE_CHAR_CHARGE', default=0.0)
-    cntySMSConversationsPerPrice = models.FloatField(db_column='CNTY_SMS_CONVERSATIONS_PER_PRICE', default=0.0)
+    cntySMSConversationsPerPrice = models.FloatField(db_column='"CNTY_SMS_CONVERSATIONS_PER_PRICE"', default=0.0)
     cntyCallPerMinPrice = models.FloatField(db_column='CNTY_CALL_PERM_IN_PRICE', default=0.0)
     cntyContactsIncluded = models.BigIntegerField(db_column='CNTY_CONTACTS_INCLUDED', null=True, blank=True)
     cntyMaxNumberOfEmail = models.BigIntegerField(db_column='CNTY_MAX_NUMBER_OF_EMAIL', null=True, blank=True)
@@ -352,7 +352,7 @@ class CountrySetting(models.Model):
     cntyAdditionalContacts = models.IntegerField(db_column='CNTY_ADDITIONAL_CONTACTS', null=True, blank=True)
     cntyAdditionalContactsPrice = models.FloatField(db_column='CNTY_ADDITIONAL_CONTACTS_PRICE', default=0.0)
     cnty10DLCPrice = models.FloatField(db_column='CNTY_10DLC_PRICE', default=0.0)
-    cnty10DLCCampaignTypeCharge = models.FloatField(db_column='CNTY_10DLC_CAMPAIGN_TYPE_CHARGE', default=0.0)
+    cnty10DLCCampaignTypeCharge = models.FloatField(db_column='"CNTY_10DLC_CAMPAIGN_TYPE_CHARGE"', default=0.0)
     cnty10DLCOtherCharge = models.FloatField(db_column='CNTY_10DLC_OTHER_CHARGE', default=0.0)
     cntyWarmupPrice = models.FloatField(db_column='CNTY_WARMUP_PRICE', default=0.0)
     ctnyAiGeneratedImage = models.FloatField(db_column='CTNY_AI_GENERATED_IMAGE', default=0.0)
@@ -468,7 +468,7 @@ class Userlist(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'tbl_userlist'
+        db_table = 'USER_LIST'
 
 class Udf(models.Model):
     id = models.BigAutoField(primary_key=True, db_column='UDF_ID')
@@ -523,7 +523,7 @@ class Admin(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'tbl_admin'
+        db_table = 'ADMIN'
 
 class AdminType(models.Model):
     styId = models.BigAutoField(primary_key=True, db_column='ATY_ID')
@@ -623,7 +623,7 @@ class CampaignsEmailSend(models.Model):
     triesCount = models.IntegerField(null=True, blank=True, db_column='CEQ_TRIES_COUNT')
     unsubscribeUid = models.TextField(null=True, blank=True, db_column='CEQ_UNSUBSCRIBE_UID')
     memberId = models.BigIntegerField(db_column='CEQ_CLIENT_ID', null=True, blank=True)
-    isProccessedByLoadbalancer = models.IntegerField(default=0, db_column='CEQ_IS_PROCCESSED_BY_LOADBALANCER')
+    isProccessedByLoadbalancer = models.IntegerField(default=0, db_column='"CEQ_IS_PROCCESSED_BY_LOADBALANCER"')
     archiveYn = models.CharField(max_length=1, default='N', db_column='CEQ_ARCHIVE_YN')
     totalQueued = models.IntegerField(default=0, db_column='CEQ_TOTAL_QUEUED')
     totalQueuedB = models.IntegerField(default=0, db_column='CEQ_TOTAL_QUEUED_B')
@@ -815,7 +815,7 @@ class Settings(models.Model):
     throttlingDomainCapacity = models.IntegerField(default=0, db_column='THROTTLING_DOMAIN_CAPACITY')
     throttlingLastTotalCampaigns = models.IntegerField(default=0, db_column='THROTTLING_LAST_TOTAL_CAMPAIGNS')
     throttlingBounceRatePercentage = models.IntegerField(default=0, db_column='THROTTLING_BOUNCE_RATE_PERCENTAGE')
-    throttlingIncreaseDomainCapacityPercentage = models.IntegerField(default=0, db_column='THROTTLING_INCREASE_DOMAIN_CAPACITY_PERCENTAGE')
+    throttlingIncreaseDomainCapacityPercentage = models.IntegerField(default=0, db_column='"THROTTLING_INCREASE_DOMAIN_CAPACITY_PERCENTAGE"')
 
     class Meta:
         managed = False
@@ -1086,8 +1086,8 @@ class EmailVerificationPrice(models.Model):
 
 
 class PlanModule(models.Model):
-    pm_id = models.AutoField(db_column='PM_ID', primary_key=True)
-    pm_title = models.CharField(db_column='PM_TITLE', max_length=255, null=True, blank=True)
+    pmId = models.AutoField(db_column='PM_ID', primary_key=True)
+    pmTitle = models.CharField(db_column='PM_TITLE', max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'PLAN_MODULES'

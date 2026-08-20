@@ -3,8 +3,8 @@ from emailCampaigns_app.views import email_campaign_views, email_campaign_report
 
 urlpatterns = [
     # Email Campaign endpoints
-    path('emailCampaign/getCampaignWiseEmailCampaignList', email_campaign_views.get_campaign_wise_email_campaign_list, name='get_campaign_wise_email_campaign_list'),
-    path('emailCampaign/getServerWiseEmailCampaignList', email_campaign_views.get_server_wise_email_campaign_list, name='get_server_wise_email_campaign_list'),
+    path('emailCampaign/getCampaignWiseEmailCampaignList/', email_campaign_views.get_campaign_wise_email_campaign_list, name='get_campaign_wise_email_campaign_list'),
+    path('emailCampaign/getServerWiseEmailCampaignList/', email_campaign_views.get_server_wise_email_campaign_list, name='get_server_wise_email_campaign_list'),
     path('emailCampaign/getContactListByCampId', email_campaign_views.get_contact_list_by_camp_id, name='get_contact_list_by_camp_id'),
     path('emailCampaign/getServerListByCampId/<int:campSendId>', email_campaign_views.get_server_list_by_camp_id, name='get_server_list_by_camp_id'),
     path('emailCampaign/reassignServer', email_campaign_views.reassign_server, name='reassign_server'),

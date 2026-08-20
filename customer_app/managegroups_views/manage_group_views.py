@@ -11,10 +11,10 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 
 from auth_app.authentication import CustomJWTAuthentication
-from common_app.models import Group, Member, Userlist
+from common_app.models import Group, Userlist, Tenants
 from common_app.responses import CustomResponse
-from common_app.decrypt_string import DecryptString
 from common_app.common_function import CommonFunction
+from common_app.utils import *
 
 logger = logging.getLogger(__name__)
 
@@ -53,12 +53,12 @@ def download_contacts(member_id: int, group_id: int) -> List[Dict[str, Any]]:
     for ul in userlists:
         email_str = ""
         if ul.email and ul.email.strip():
-            email_str = DecryptString.setEncDecUser(ul.email, "display", "Y") or ""
+            email_str = ul.email
 
         birthday_str = ""
         if ul.birthday and ul.birthday.strip():
             try:
-                decrypted_bday = DecryptString.setEncDecUser(ul.birthday, "display", "Y")
+                decrypted_bday = ul.birthday
                 if decrypted_bday and decrypted_bday.strip():
                     birthday_str = CommonFunction.displayDate(decrypted_bday)
             except Exception:
@@ -76,30 +76,30 @@ def download_contacts(member_id: int, group_id: int) -> List[Dict[str, Any]]:
             "email": email_str,
             "country": ul.country if ul.country else "",
             "phoneNumber": ul.phoneNumber,
-            "subMemberId": ul.subMemberId,
+            # "subMemberId": ul.subMemberId,
             "address": None,
-            "age": ul.age,
+            # "age": ul.age,
             "badEmail": ul.badEmail,
             "badPhoneNumber": ul.badPhoneNumber,
             "bouncereason": ul.bounceReason,
-            "cc": ul.cc,
+            # "cc": ul.cc,
             "city": ul.city,
-            "confirmDateTime": fmt_dt(ul.confirmDateTime),
-            "confirmIP": ul.confirmIP,
-            "contactRating": ul.contactRating,
+            # "confirmDateTime": fmt_dt(ul.confirmDateTime),
+            # "confirmIP": ul.confirmIP,
+            # "contactRating": ul.contactRating,
             "dateRegistered": fmt_dt(ul.dateRegistered),
             "dateAdded": fmt_dt(ul.dateAdded),
             "dateLastModified": fmt_dt(ul.dateLastModified),
-            "dstOff": ul.dstOff,
+            # "dstOff": ul.dstOff,
             "emailDomain": ul.emailDomain,
-            "emailClientUsed": ul.emailClientUsed,
-            "emailLists": ul.emailLists,
-            "emailPermissionStatusOther": ul.emailPermissionStatusOther,
-            "euid": ul.euid,
+            # "emailClientUsed": ul.emailClientUsed,
+            # "emailLists": ul.emailLists,
+            # "emailPermissionStatusOther": ul.emailPermissionStatusOther,
+            # "euid": ul.euid,
             "gender": ul.gender,
-            "gmtOff": ul.gmtOff,
+            # "gmtOff": ul.gmtOff,
             "isEmailValidate": ul.isEmailValidate,
-            "isChecked": ul.isChecked,
+            # "isChecked": ul.isChecked,
             "jobTitle": ul.jobTitle,
             "latitude": ul.latitude,
             "leid": ul.leid,
@@ -154,11 +154,11 @@ def get_group(request: Request, groupId: int) -> CustomResponse:
         created_by = ""
         if group.memberId:
             try:
-                member = Member.objects.get(memberId=group.memberId)
-                first = DecryptString.setEncDecUser(member.firstName, "display", "Y") or ""
-                last = DecryptString.setEncDecUser(member.lastName, "display", "Y") or ""
+                member = Tenants.objects.select_related('details').get(ten_id=get_client_id_by_tenant_id(group.memberId))
+                first = member.ten_first_name or ""
+                last = member.ten_last_name or ""
                 created_by = f"{first} {last}".strip()
-            except Member.DoesNotExist:
+            except Tenants.DoesNotExist:
                 pass
 
         group_dto = {
@@ -233,20 +233,20 @@ def get_group_list_page(request: Request) -> CustomResponse:
             created_by = ""
             if group.memberId:
                 try:
-                    member = Member.objects.get(memberId=group.memberId)
-                    first = DecryptString.setEncDecUser(member.firstName, "display", "Y") or ""
-                    last = DecryptString.setEncDecUser(member.lastName, "display", "Y") or ""
+                    member = Tenants.objects.select_related('details').get(ten_id=get_client_id_by_tenant_id(group.memberId))
+                    first = member.ten_first_name or ""
+                    last = member.ten_last_name or ""
                     created_by = f"{first} {last}".strip()
-                except Member.DoesNotExist:
+                except Tenants.DoesNotExist:
                     pass
 
             group_dto = {
                 "groupId": group.groupId,
                 "dateRegistered": date_reg_str,
-                "ecomCustListType": group.ecomCustListType,
+                # "ecomCustListType": group.ecomCustListType,
                 "groupName": group.groupName,
-                "storeName": group.storeName,
-                "subMemberId": group.subMemberId,
+                # "storeName": group.storeName,
+                # "subMemberId": group.subMemberId,
                 "memberId": group.memberId,
                 "udfs": None,
                 "groupSegment": None,

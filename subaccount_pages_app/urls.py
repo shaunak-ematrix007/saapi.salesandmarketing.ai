@@ -9,6 +9,6 @@ urlpatterns = [
     path('subaccountPages/saveSubaccountPage', subaccount_pages_views.save_subaccount_page, name='save_subaccount_page'),
     path('subaccountPages/getSubaccountPage/<int:pgId>', subaccount_pages_views.get_subaccount_page, name='get_subaccount_page'),
     path('subaccountPages/getSubaccountPageDetails/<int:pgId>', subaccount_pages_views.get_subaccount_page_details, name='get_subaccount_page_details'),
-    path('subaccountPages/getSubaccountPageList', subaccount_pages_views.get_subaccount_page_list, name='get_subaccount_page_list'),
+    path('subaccountPages/getSubaccountPageList/', subaccount_pages_views.get_subaccount_page_list, name='get_subaccount_page_list'),
     path('subaccountPages/deleteSubaccountPage', subaccount_pages_views.delete_subaccount_page, name='delete_subaccount_page'),
 ]

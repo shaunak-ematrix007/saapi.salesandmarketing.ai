@@ -6,9 +6,8 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 
-from common_app.models import CampaignTransaction, Member, Invoice
+from common_app.models import CampaignTransaction, Invoice, Tenants
 from common_app.responses import CustomResponse
-from common_app.decrypt_string import DecryptString
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +45,14 @@ def serialize_campaign_transaction(ct: CampaignTransaction) -> Dict[str, Any]:
 def get_uninvoice_members(request: Request) -> CustomResponse:
     """Returns members who have a membershipType value, with their names decrypted."""
     try:
-        members = Member.objects.filter(membershipType__isnull=False)
+        members = Tenants.objects.select_related('details').filter(details__td_membership_type__isnull=False)
         member_dtos = []
         for member in members:
-            first_name_dec = DecryptString.setEncDecUser(member.firstName, "display", "Y") or ""
-            last_name_dec = DecryptString.setEncDecUser(member.lastName, "display", "Y") or ""
+            first_name_dec = member.ten_first_name or ""
+            last_name_dec = member.ten_last_name or ""
             full_name = f"{first_name_dec} {last_name_dec}".strip()
             member_dtos.append({
-                "memberId": member.memberId,
+                "memberId": member.ten_id,
                 "memberFullName": full_name
             })
         

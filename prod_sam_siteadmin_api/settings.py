@@ -196,7 +196,7 @@ SITEURL = 'https://samsa.salesandmarketing.ai/'
 SITEURLBACKEND = 'https://samsaapi.salesandmarketing.ai/v1/'
 
 # Storage Paths
-ABSOLUTE_SITE_URL = Path('/prod_samai_webapp_server/webroot/webapp.salesandmarketing.ai/')
+ABSOLUTE_SITE_URL = Path('/qa_samai_webapp_server/webroot/sa.salesandmarketing.ai/')
 CSVSTORE_UPLOAD_DIR = ABSOLUTE_SITE_URL / 'csv_store/'
 CSVDOWNLOAD_DIR = ABSOLUTE_SITE_URL / 'csv_download/'
 PDFSAVE_UPLOAD_DIR = ABSOLUTE_SITE_URL / 'pdfsave/'

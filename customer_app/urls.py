@@ -6,7 +6,7 @@ urlpatterns = [
     # Manage Group Routes
     path('manageGroup/getGroup/<int:groupId>', manage_group_views.get_group, name='get_group'),
     path('manageGroup/deleteGroups', manage_group_views.delete_groups, name='delete_groups'),
-    path('manageGroup/getGroupListPage', manage_group_views.get_group_list_page, name='get_group_list_page'),
+    path('manageGroup/getGroupListPage/', manage_group_views.get_group_list_page, name='get_group_list_page'),
     path('manageGroup/exportGroup/<int:groupId>/<int:memberId>', manage_group_views.get_download_contact_file, name='get_download_contact_file'),
 
     # Contact Import Routes
@@ -19,7 +19,7 @@ urlpatterns = [
 
     # Customer Module Routes
     path('manageCustomer/importContact', contact_import_views.import_contact_by_admin_side, name='import_contact_by_admin_side'),
-    path('manageCustomer/getCustomerListPage', customer_views.get_customer_list_page, name='get_customer_list_page'),
+    path('manageCustomer/getCustomerListPage/', customer_views.get_customer_list_page, name='get_customer_list_page'),
     path('manageCustomer/getCustomerListPage/<str:searchKey>', customer_views.get_customer_list_page, name='get_customer_list_page_with_search'),
     path('manageCustomer/deleteCustomers', customer_views.delete_customers, name='delete_customers'),
 

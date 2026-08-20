@@ -113,8 +113,8 @@ def get_campaign_wise_email_campaign_list(request: Request) -> CustomResponse:
                 ).count()
 
                 # Pay special attention to the logic used for counting queued campaign emails on tbl_automation_send_contact
-                automation_queued = AutomationSendContact.objects.filter(campaignId=camp_id, status='QUEUED').count()
-                pending_members += automation_queued
+                # automation_queued = AutomationSendContact.objects.filter(campaignId=camp_id, status='QUEUED').count()
+                # pending_members += automation_queued
 
                 # Camp status
                 camp_status_val = CampaignsEmail.objects.filter(campId=camp_id).values_list('campStatus', flat=True).first()

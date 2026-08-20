@@ -9,7 +9,6 @@ from rest_framework.permissions import IsAuthenticated
 from auth_app.authentication import CustomJWTAuthentication
 from common_app.models import Userlist
 from common_app.responses import CustomResponse
-from common_app.decrypt_string import DecryptString
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ def serialize_customer(userlist: Userlist) -> Dict[str, Any]:
     email_str = ""
     if userlist.email and userlist.email.strip():
         try:
-            email_str = DecryptString.setEncDecUser(userlist.email, "display", "Y") or ""
+            email_str = userlist.email or ""
         except Exception:
             email_str = ""
 
